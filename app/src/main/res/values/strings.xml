@@ -1,0 +1,9 @@
+<resources>
+    <string name="app_name">DoctorSearch</string>
+    <string name="action_settings">Settings</string>
+
+    <string name="login">Login</string>
+    <string name="logging_in">Please wait, logging in…</string>
+    <string name="error_logging_in">Error logging in…</string>
+    <string name="enter_doctor_name">Enter doctor\'s name</string>
+</resources>
