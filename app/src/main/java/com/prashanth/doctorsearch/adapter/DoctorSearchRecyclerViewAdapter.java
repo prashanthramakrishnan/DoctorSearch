@@ -134,4 +134,10 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
                 });
     }
 
+    public void update(ArrayList<Doctor> doctors){
+        doctorList.clear();
+        doctorList.addAll(doctors);
+        notifyDataSetChanged();
+    }
+
 }

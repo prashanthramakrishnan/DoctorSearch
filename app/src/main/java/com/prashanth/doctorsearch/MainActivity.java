@@ -17,6 +17,7 @@ import com.jakewharton.rxbinding3.widget.RxTextView;
 import com.jakewharton.rxbinding3.widget.TextViewTextChangeEvent;
 import com.prashanth.doctorsearch.adapter.DoctorSearchRecyclerViewAdapter;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
+import com.prashanth.doctorsearch.network.model.Doctor;
 import com.prashanth.doctorsearch.network.model.DoctorSearchResponse;
 import com.prashanth.doctorsearch.network.networkwrapper.DoctorSearchRetrofitWrapper;
 import com.prashanth.doctorsearch.storage.LoginSharedPreferences;
@@ -25,6 +26,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
+import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import retrofit2.HttpException;
 import retrofit2.Retrofit;
@@ -44,11 +46,11 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
 
     private Disposable disposable;
 
-    private LinearLayoutManager linearLayoutManager;
-
     private boolean loading = true;
 
-    int pastVisibleItems, visibleItemCount, totalItemCount;
+    private DoctorSearchRecyclerViewAdapter adapter;
+
+    ArrayList<Doctor> doctors = new ArrayList<>();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -61,33 +63,10 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
         Retrofit retrofitForDoctorSearch = DoctorSearchRetrofitWrapper.retrofitClient(Constants.LOGGED_IN_URL);
         doctorSearchAPI = retrofitForDoctorSearch.create(DoctorSearchAPI.class);
 
-        linearLayoutManager = new LinearLayoutManager(MainActivity.this);
-
-        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
-            @Override
-            public void onScrolled(RecyclerView recyclerView, int dx, int dy) {
-                if (dy > 0) //check for scroll down
-                {
-                    visibleItemCount = linearLayoutManager.getChildCount();
-                    totalItemCount = linearLayoutManager.getItemCount();
-                    pastVisibleItems = linearLayoutManager.findFirstVisibleItemPosition();
-
-                    if (loading) {
-                        if ((visibleItemCount + pastVisibleItems) >= totalItemCount) {
-                            loading = false;
-                            Timber.d("Last item");
-                            //Do pagination.. i.e. fetch new data
-                            if (loginSharedPreferences.getLastKey() != null) {
-                                doctorSearchAPICall(searchEditText.getText().toString(), loginSharedPreferences.getLastKey());
-                            } else {
-                                Timber.d("Last key %s", loginSharedPreferences.getLastKey());
-                            }
-                        }
-                    }
-                }
-            }
-        });
-
+        LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
+        adapter = new DoctorSearchRecyclerViewAdapter(MainActivity.this, doctors);
+        recyclerView.setLayoutManager(linearLayoutManager);
+        recyclerView.setAdapter(adapter);
     }
 
     @Override
@@ -117,10 +96,14 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
                     @Override
                     public void onNext(DoctorSearchResponse doctorSearchResponse) {
                         Timber.d("Search response %s", doctorSearchResponse.getDoctors().size());
+                        if (lastKey == null) {
+                            if (!doctorSearchResponse.getDoctors().isEmpty()) {
+                                doctors = doctorSearchResponse.getDoctors();
+                                adapter.update(doctors);
+                            }
+                        }
                         loginSharedPreferences.setLastKey(doctorSearchResponse.getLastKey());
-                        DoctorSearchRecyclerViewAdapter adapter = new DoctorSearchRecyclerViewAdapter(MainActivity.this, doctorSearchResponse.getDoctors());
-                        recyclerView.setLayoutManager(linearLayoutManager);
-                        recyclerView.setAdapter(adapter);
+
                     }
 
                     @Override
