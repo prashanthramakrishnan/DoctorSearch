@@ -71,7 +71,7 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
 
     @Override
     public int getItemCount() {
-        return doctorList.size();
+        return doctorList == null ? 0 : doctorList.size();
     }
 
     public class ViewHolder extends RecyclerView.ViewHolder {

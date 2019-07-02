@@ -8,6 +8,7 @@ import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
@@ -46,8 +47,6 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
 
     private Disposable disposable;
 
-    private boolean loading = true;
-
     private DoctorSearchRecyclerViewAdapter adapter;
 
     ArrayList<Doctor> doctors = new ArrayList<>();
@@ -67,6 +66,35 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
         adapter = new DoctorSearchRecyclerViewAdapter(MainActivity.this, doctors);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(adapter);
+
+        initScrollListener();
+    }
+
+    private void initScrollListener() {
+        recyclerView.addOnScrollListener(new RecyclerView.OnScrollListener() {
+            @Override
+            public void onScrollStateChanged(@NonNull RecyclerView recyclerView, int newState) {
+                super.onScrollStateChanged(recyclerView, newState);
+            }
+
+            @Override
+            public void onScrolled(@NonNull RecyclerView recyclerView, int dx, int dy) {
+                super.onScrolled(recyclerView, dx, dy);
+                LinearLayoutManager linearLayoutManager = (LinearLayoutManager) recyclerView.getLayoutManager();
+
+                if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == doctors.size() - 1) {
+                    //bottom of list!
+                    if (loginSharedPreferences.getLastKey() != null) {
+                        doctorSearchAPICall(searchEditText.getText().toString(), loginSharedPreferences.getLastKey());
+                    }
+                }
+            }
+        });
+    }
+
+    private void updateRecycleView(ArrayList<Doctor> doctorArrayList) {
+        doctors.addAll(doctorArrayList);
+        adapter.update(doctors);
     }
 
     @Override
@@ -101,8 +129,11 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
                                 doctors = doctorSearchResponse.getDoctors();
                                 adapter.update(doctors);
                             }
+                        } else {
+                            updateRecycleView(doctorSearchResponse.getDoctors());
                         }
                         loginSharedPreferences.setLastKey(doctorSearchResponse.getLastKey());
+                        Timber.d("Last key %s", loginSharedPreferences.getLastKey());
 
                     }
 
