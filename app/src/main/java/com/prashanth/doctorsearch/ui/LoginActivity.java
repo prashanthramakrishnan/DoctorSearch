@@ -86,9 +86,7 @@ public class LoginActivity extends AppCompatActivity {
             fields.put(Constants.PASSWORD_KEY, passwordField.getText().toString());
             fields.put(Constants.GRANT_TYPE_KEY, Constants.GRANT_TYPE_VALUE);
 
-            loginApi.login(Constants.CONTENT_TYPE,
-                    Constants.CONTENT_TYPE_ACCEPT_VALUE,
-                    DoctorSearchAPI.AUTHORIZATION, fields)
+            loginApi.login(fields)
                     .subscribeOn(Schedulers.io())
                     .observeOn(AndroidSchedulers.mainThread())
                     .subscribeWith(new DisposableObserver<LoginResponse>() {

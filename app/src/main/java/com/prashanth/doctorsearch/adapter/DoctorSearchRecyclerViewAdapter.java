@@ -12,7 +12,6 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
-import com.prashanth.doctorsearch.Constants;
 import com.prashanth.doctorsearch.DoctorSearchApplication;
 import com.prashanth.doctorsearch.R;
 import com.prashanth.doctorsearch.dependencyInjection.NetworkDaggerModule;
@@ -101,7 +100,6 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
     @SuppressLint("CheckResult")
     private void getPictureFromDoctorIDCall(Context context, String doctorId, @NotNull DoctorSearchRecyclerViewAdapter.ViewHolder holder) {
         doctorSearchAPI.getProfilePicture(doctorId,
-                Constants.CONTENT_TYPE_ACCEPT_VALUE,
                 "Bearer " + loginSharedPreferences.getAccessToken())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

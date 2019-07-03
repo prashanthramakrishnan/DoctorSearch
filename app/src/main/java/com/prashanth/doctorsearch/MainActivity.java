@@ -134,7 +134,6 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
                 String.valueOf(latitude),
                 String.valueOf(longitude),
                 lastKey,
-                Constants.CONTENT_TYPE_ACCEPT_VALUE,
                 "Bearer " + loginSharedPreferences.getAccessToken())
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())

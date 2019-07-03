@@ -17,15 +17,10 @@ import retrofit2.http.Query;
 
 public interface DoctorSearchAPI {
 
-    String AUTHORIZATION = "Basic " + "aXBob25lOmlwaG9uZXdpbGxub3RiZXRoZXJlYW55bW9yZQ==";
-
     @Keep
     @FormUrlEncoded
     @POST("/oauth/token")
-    Observable<LoginResponse> login(@Header("Content-Type") String contentType,
-                              @Header("Accept") String contentTypeAccept,
-                              @Header("Authorization") String authorization,
-                              @FieldMap Map<String, String> doctorSearchLoginModel);
+    Observable<LoginResponse> login(@FieldMap Map<String, String> doctorSearchLoginModel);
 
     @Keep
     @GET("/api/users/me/doctors")
@@ -33,13 +28,11 @@ public interface DoctorSearchAPI {
                                                 @Query("lat") String latitude,
                                                 @Query("lng") String longitude,
                                                 @Query("lastKey") String lastKey,
-                                                @Header("Accept") String contentType,
                                                 @Header("Authorization") String accessToken);
 
     @Keep
     @GET("/api/doctors/{doctorId}/keys/profilepictures")
     Observable<Response<ResponseBody>> getProfilePicture(@Path("doctorId") String doctorId,
-                                               @Header("Accept") String contentType,
                                                @Header("Authorization") String accessToken);
 
 }

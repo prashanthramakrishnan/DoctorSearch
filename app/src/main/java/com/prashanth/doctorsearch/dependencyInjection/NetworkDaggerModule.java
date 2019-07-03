@@ -4,6 +4,7 @@ import android.app.Application;
 import com.google.gson.FieldNamingPolicy;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
+import com.prashanth.doctorsearch.BuildConfig;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
 import dagger.Module;
 import dagger.Provides;
@@ -12,6 +13,7 @@ import javax.inject.Named;
 import javax.inject.Singleton;
 import okhttp3.Cache;
 import okhttp3.OkHttpClient;
+import okhttp3.Request;
 import okhttp3.logging.HttpLoggingInterceptor;
 import retrofit2.Retrofit;
 import retrofit2.adapter.rxjava2.RxJava2CallAdapterFactory;
@@ -56,6 +58,21 @@ public class NetworkDaggerModule {
         client.readTimeout(TIMEOUT, TimeUnit.SECONDS);
         client.connectTimeout(TIMEOUT, TimeUnit.SECONDS);
         client.addInterceptor(debugInterceptor);
+        client.addInterceptor(chain -> {
+            Request request = chain.request();
+            if ((BuildConfig.LOGIN_ENDPOINT + "oauth/token").equals((chain.request().url().toString()))) {
+                request = request.newBuilder()
+                        .addHeader("Content-Type", "application/x-www-form-urlencoded")
+                        .addHeader("Accept", "application/json")
+                        .addHeader("Authorization", "Basic " + "aXBob25lOmlwaG9uZXdpbGxub3RiZXRoZXJlYW55bW9yZQ==")
+                        .build();
+            } else {
+                request = request.newBuilder()
+                        .addHeader("Accept", "application/json")
+                        .build();
+            }
+            return chain.proceed(request);
+        });
         return client.build();
     }
 
