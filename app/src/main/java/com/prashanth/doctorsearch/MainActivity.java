@@ -38,7 +38,6 @@ import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
 import retrofit2.HttpException;
-import retrofit2.Retrofit;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements EditText.OnEditorActionListener {
@@ -51,10 +50,6 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
 
     @Inject
     LoginSharedPreferences loginSharedPreferences;
-
-    @Inject
-    @Named(NetworkDaggerModule.AUTHENTICATED)
-    Retrofit retrofitForDoctorSearch;
 
     @Inject
     @Named(NetworkDaggerModule.AUTHENTICATED)

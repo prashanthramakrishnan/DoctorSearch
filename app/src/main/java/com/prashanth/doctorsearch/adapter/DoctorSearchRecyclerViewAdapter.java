@@ -13,21 +13,23 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.prashanth.doctorsearch.Constants;
+import com.prashanth.doctorsearch.DoctorSearchApplication;
 import com.prashanth.doctorsearch.R;
+import com.prashanth.doctorsearch.dependencyInjection.NetworkDaggerModule;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
 import com.prashanth.doctorsearch.network.model.Doctor;
-import com.prashanth.doctorsearch.network.networkwrapper.DoctorSearchRetrofitWrapper;
 import com.prashanth.doctorsearch.storage.LoginSharedPreferences;
 import com.prashanth.doctorsearch.ui.LoginActivity;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import java.util.ArrayList;
+import javax.inject.Inject;
+import javax.inject.Named;
 import okhttp3.ResponseBody;
 import org.jetbrains.annotations.NotNull;
 import retrofit2.HttpException;
 import retrofit2.Response;
-import retrofit2.Retrofit;
 import timber.log.Timber;
 
 public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<DoctorSearchRecyclerViewAdapter.ViewHolder> {
@@ -36,12 +38,18 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
 
     private Context context;
 
-    private LoginSharedPreferences loginSharedPreferences;
+    @Inject
+    LoginSharedPreferences loginSharedPreferences;
+
+    @Inject
+    @Named(NetworkDaggerModule.AUTHENTICATED)
+    DoctorSearchAPI doctorSearchAPI;
+
 
     public DoctorSearchRecyclerViewAdapter(Context context, ArrayList<Doctor> doctorList) {
         this.context = context;
         this.doctorList = doctorList;
-        loginSharedPreferences = new LoginSharedPreferences(context);
+        DoctorSearchApplication.component.inject(this);
     }
 
     @NotNull
@@ -92,8 +100,6 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
 
     @SuppressLint("CheckResult")
     private void getPictureFromDoctorIDCall(Context context, String doctorId, @NotNull DoctorSearchRecyclerViewAdapter.ViewHolder holder) {
-        Retrofit retrofitForDoctorSearch = DoctorSearchRetrofitWrapper.retrofitClient(Constants.LOGGED_IN_URL);
-        DoctorSearchAPI doctorSearchAPI = retrofitForDoctorSearch.create(DoctorSearchAPI.class);
         doctorSearchAPI.getProfilePicture(doctorId,
                 Constants.CONTENT_TYPE_ACCEPT_VALUE,
                 "Bearer " + loginSharedPreferences.getAccessToken())

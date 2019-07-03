@@ -29,7 +29,6 @@ import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
 import javax.inject.Named;
-import retrofit2.Retrofit;
 import timber.log.Timber;
 
 public class LoginActivity extends AppCompatActivity {
@@ -42,10 +41,6 @@ public class LoginActivity extends AppCompatActivity {
 
     @Inject
     LoginSharedPreferences loginSharedPreferences;
-
-    @Inject
-    @Named(NetworkDaggerModule.LOGIN)
-    Retrofit retrofit;
 
     @Inject
     @Named(NetworkDaggerModule.LOGIN)
