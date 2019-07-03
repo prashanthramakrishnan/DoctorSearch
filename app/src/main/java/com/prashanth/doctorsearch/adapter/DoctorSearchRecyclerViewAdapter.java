@@ -102,12 +102,15 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
                 .subscribeWith(new DisposableObserver<Response<ResponseBody>>() {
                     @Override
                     public void onNext(Response<ResponseBody> response) {
-                        Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
-                        Glide.with(context)
-                                .load(bitmap)
-                                .placeholder(R.drawable.placeholder)
-                                .error(R.drawable.placeholder)
-                                .into(holder.photo);
+                        if (response != null && response.body() != null && response.body().byteStream() != null) {
+                            Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
+                            Glide.with(context)
+                                    .load(bitmap)
+                                    .placeholder(R.drawable.placeholder)
+                                    .error(R.drawable.placeholder)
+                                    .into(holder.photo);
+
+                        }
                     }
 
                     @Override
@@ -134,7 +137,7 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
                 });
     }
 
-    public void update(ArrayList<Doctor> doctors){
+    public void update(ArrayList<Doctor> doctors) {
         doctorList.clear();
         doctorList.addAll(doctors);
         notifyDataSetChanged();

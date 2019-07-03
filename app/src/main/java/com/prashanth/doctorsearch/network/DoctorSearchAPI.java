@@ -6,7 +6,6 @@ import com.prashanth.doctorsearch.network.model.LoginResponse;
 import io.reactivex.Observable;
 import java.util.Map;
 import okhttp3.ResponseBody;
-import retrofit2.Call;
 import retrofit2.Response;
 import retrofit2.http.FieldMap;
 import retrofit2.http.FormUrlEncoded;
@@ -23,7 +22,7 @@ public interface DoctorSearchAPI {
     @Keep
     @FormUrlEncoded
     @POST("/oauth/token")
-    Call<LoginResponse> login(@Header("Content-Type") String contentType,
+    Observable<LoginResponse> login(@Header("Content-Type") String contentType,
                               @Header("Accept") String contentTypeAccept,
                               @Header("Authorization") String authorization,
                               @FieldMap Map<String, String> doctorSearchLoginModel);
@@ -42,7 +41,5 @@ public interface DoctorSearchAPI {
     Observable<Response<ResponseBody>> getProfilePicture(@Path("doctorId") String doctorId,
                                                @Header("Accept") String contentType,
                                                @Header("Authorization") String accessToken);
-
-
 
 }

@@ -1,19 +1,24 @@
 package com.prashanth.doctorsearch;
 
+import android.Manifest;
 import android.annotation.SuppressLint;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.KeyEvent;
 import android.view.inputmethod.EditorInfo;
 import android.view.inputmethod.InputMethodManager;
 import android.widget.EditText;
 import android.widget.TextView;
+import android.widget.Toast;
 import androidx.annotation.NonNull;
 import androidx.appcompat.app.AppCompatActivity;
 import androidx.recyclerview.widget.LinearLayoutManager;
 import androidx.recyclerview.widget.RecyclerView;
 import butterknife.BindView;
 import butterknife.ButterKnife;
+import com.google.android.gms.location.FusedLocationProviderClient;
+import com.google.android.gms.location.LocationServices;
 import com.jakewharton.rxbinding3.widget.RxTextView;
 import com.jakewharton.rxbinding3.widget.TextViewTextChangeEvent;
 import com.prashanth.doctorsearch.adapter.DoctorSearchRecyclerViewAdapter;
@@ -27,6 +32,7 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
+import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import retrofit2.HttpException;
@@ -49,13 +55,30 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
 
     private DoctorSearchRecyclerViewAdapter adapter;
 
+    private FusedLocationProviderClient fusedLocationClient;
+
     ArrayList<Doctor> doctors = new ArrayList<>();
+
+    private double latitude, longitude;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
+
+        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+
+        if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            fusedLocationClient.getLastLocation()
+                    .addOnSuccessListener(this, location -> {
+                        if (location != null) {
+                            latitude = location.getLatitude();
+                            longitude = location.getLongitude();
+                            Timber.d("Location %s %s", location.getLatitude(), location.getLongitude());
+                        }
+                    });
+        }
 
         //use dagger
         loginSharedPreferences = new LoginSharedPreferences(this);
@@ -110,11 +133,13 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
         attachEditTextBindings();
     }
 
+    //    "52.534709",
+    //    "13.3976972",
     @SuppressLint("CheckResult")
     private void doctorSearchAPICall(String queryName, String lastKey) {
         doctorSearchAPI.getDoctors(queryName,
-                "52.534709",
-                "13.3976972",
+                String.valueOf(latitude),
+                String.valueOf(longitude),
                 lastKey,
                 Constants.CONTENT_TYPE_ACCEPT_VALUE,
                 "Bearer " + loginSharedPreferences.getAccessToken())
@@ -145,6 +170,9 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
                             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                             startActivity(intent);
                             finish();
+                        }
+                        if (e instanceof IOException) {
+                            Toast.makeText(MainActivity.this, R.string.internet_not_available, Toast.LENGTH_SHORT).show();
                         }
                     }
 

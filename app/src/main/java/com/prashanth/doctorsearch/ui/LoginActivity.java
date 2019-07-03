@@ -1,9 +1,13 @@
 package com.prashanth.doctorsearch.ui;
 
+import android.Manifest;
+import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
+import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.widget.EditText;
+import android.widget.Toast;
 import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
@@ -16,11 +20,12 @@ import com.prashanth.doctorsearch.network.DoctorSearchAPI;
 import com.prashanth.doctorsearch.network.model.LoginResponse;
 import com.prashanth.doctorsearch.network.networkwrapper.DoctorSearchRetrofitWrapper;
 import com.prashanth.doctorsearch.storage.LoginSharedPreferences;
+import com.tbruyelle.rxpermissions2.RxPermissions;
+import io.reactivex.android.schedulers.AndroidSchedulers;
+import io.reactivex.observers.DisposableObserver;
+import io.reactivex.schedulers.Schedulers;
 import java.util.HashMap;
 import java.util.Map;
-import retrofit2.Call;
-import retrofit2.Callback;
-import retrofit2.Response;
 import retrofit2.Retrofit;
 import timber.log.Timber;
 
@@ -38,11 +43,15 @@ public class LoginActivity extends AppCompatActivity {
 
     private ProgressDialog progressDialog;
 
+    private RxPermissions rxPermissions;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
+
+        rxPermissions = new RxPermissions(this);
 
         //use dagger
         loginSharedPreferences = new LoginSharedPreferences(this);
@@ -56,9 +65,14 @@ public class LoginActivity extends AppCompatActivity {
 
     @OnClick(R.id.login_button)
     void onButtonClicked() {
-        performLoginAPICall();
+        if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
+            performLoginAPICall();
+        } else {
+            Toast.makeText(LoginActivity.this, R.string.location_permission_missing, Toast.LENGTH_SHORT).show();
+        }
     }
 
+    @SuppressLint("CheckResult")
     private void performLoginAPICall() {
 
         if (progressDialog != null && !progressDialog.isShowing()) {
@@ -72,27 +86,34 @@ public class LoginActivity extends AppCompatActivity {
             fields.put(Constants.GRANT_TYPE_KEY, Constants.GRANT_TYPE_VALUE);
 
             final DoctorSearchAPI loginApi = retrofit.create(DoctorSearchAPI.class);
-            Call<LoginResponse> responseCall = loginApi.login(Constants.CONTENT_TYPE,
+            loginApi.login(Constants.CONTENT_TYPE,
                     Constants.CONTENT_TYPE_ACCEPT_VALUE,
-                    DoctorSearchAPI.AUTHORIZATION, fields);
+                    DoctorSearchAPI.AUTHORIZATION, fields)
+                    .subscribeOn(Schedulers.io())
+                    .observeOn(AndroidSchedulers.mainThread())
+                    .subscribeWith(new DisposableObserver<LoginResponse>() {
+                        @Override
+                        public void onNext(LoginResponse loginResponse) {
+                            if (loginResponse != null) {
+                                Timber.d("Access token set");
+                                loginSharedPreferences.setAccessToken(loginResponse.getAccess_token());
+                                startMainActivity();
+                            }
+                            progressDialog.dismiss();
+                        }
 
-            responseCall.enqueue(new Callback<LoginResponse>() {
-                @Override
-                public void onResponse(Call<LoginResponse> call, Response<LoginResponse> response) {
-                    if (response.body() != null) {
-                        Timber.d("Access token set %s", response.body().getAccess_token());
-                        loginSharedPreferences.setAccessToken(response.body().getAccess_token());
-                        startMainActivity();
-                    }
-                    progressDialog.dismiss();
-                }
+                        @Override
+                        public void onError(Throwable e) {
+                            Timber.e(e, "Error logging in");
+                            progressDialog.dismiss();
+                            Toast.makeText(LoginActivity.this, R.string.error_logging_in, Toast.LENGTH_SHORT).show();
+                        }
 
-                @Override
-                public void onFailure(Call<LoginResponse> call, Throwable t) {
-                    progressDialog.setMessage(getString(R.string.error_logging_in));
-                }
-            });
-
+                        @Override
+                        public void onComplete() {
+                            //do nothing
+                        }
+                    });
         }
 
     }
@@ -103,11 +124,19 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
+    @SuppressLint("CheckResult")
     @Override
     protected void onResume() {
         super.onResume();
-        if (loginSharedPreferences.getAccessToken() != null) {
-            startMainActivity();
-        }
+        rxPermissions.request(Manifest.permission.ACCESS_FINE_LOCATION)
+                .subscribe(granted -> {
+                    if (granted) {
+                        if (loginSharedPreferences.getAccessToken() != null) {
+                            startMainActivity();
+                        }
+                    } else {
+                        Toast.makeText(LoginActivity.this, R.string.location_permission_missing, Toast.LENGTH_SHORT).show();
+                    }
+                });
     }
 }

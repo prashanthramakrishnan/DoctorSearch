@@ -6,4 +6,6 @@
     <string name="logging_in">Please wait, logging in…</string>
     <string name="error_logging_in">Error logging in…</string>
     <string name="enter_doctor_name">Enter doctor\'s name</string>
+    <string name="location_permission_missing">Location permission needed to access this application</string>
+    <string name="internet_not_available">Check your internet connection</string>
 </resources>
