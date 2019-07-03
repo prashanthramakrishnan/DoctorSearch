@@ -6,6 +6,7 @@ import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
 import com.prashanth.doctorsearch.BuildConfig;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
+import com.prashanth.doctorsearch.storage.LoginSharedPreferences;
 import dagger.Module;
 import dagger.Provides;
 import java.util.concurrent.TimeUnit;
@@ -46,7 +47,7 @@ public class NetworkDaggerModule {
 
     @Provides
     @Singleton
-    OkHttpClient provideOkhttpClient(Cache cache) {
+    OkHttpClient provideOkhttpClient(Cache cache, LoginSharedPreferences loginSharedPreferences) {
         HttpLoggingInterceptor debugInterceptor = new HttpLoggingInterceptor();
         debugInterceptor.setLevel(HttpLoggingInterceptor.Level.BODY);
         OkHttpClient.Builder client = new OkHttpClient.Builder();
@@ -69,6 +70,7 @@ public class NetworkDaggerModule {
             } else {
                 request = request.newBuilder()
                         .addHeader("Accept", "application/json")
+                        .addHeader("Authorization", "Bearer " + loginSharedPreferences.getAccessToken())
                         .build();
             }
             return chain.proceed(request);

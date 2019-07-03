@@ -44,7 +44,6 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
     @Named(NetworkDaggerModule.AUTHENTICATED)
     DoctorSearchAPI doctorSearchAPI;
 
-
     public DoctorSearchRecyclerViewAdapter(Context context, ArrayList<Doctor> doctorList) {
         this.context = context;
         this.doctorList = doctorList;
@@ -99,8 +98,7 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
 
     @SuppressLint("CheckResult")
     private void getPictureFromDoctorIDCall(Context context, String doctorId, @NotNull DoctorSearchRecyclerViewAdapter.ViewHolder holder) {
-        doctorSearchAPI.getProfilePicture(doctorId,
-                "Bearer " + loginSharedPreferences.getAccessToken())
+        doctorSearchAPI.getProfilePicture(doctorId)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableObserver<Response<ResponseBody>>() {
@@ -131,6 +129,8 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
                                 intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
                                 context.startActivity(intent);
                             }
+                        } else {
+                            Timber.e(e,"Handle this!");
                         }
                     }
 

@@ -32,7 +32,6 @@ import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
-import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
@@ -132,9 +131,7 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
     private void doctorSearchAPICall(String queryName, String lastKey) {
         doctorSearchAPI.getDoctors(queryName,
                 String.valueOf(latitude),
-                String.valueOf(longitude),
-                lastKey,
-                "Bearer " + loginSharedPreferences.getAccessToken())
+                String.valueOf(longitude), lastKey)
                 .subscribeOn(Schedulers.io())
                 .observeOn(AndroidSchedulers.mainThread())
                 .subscribeWith(new DisposableObserver<DoctorSearchResponse>() {
@@ -162,8 +159,7 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
                             Intent intent = new Intent(MainActivity.this, LoginActivity.class);
                             startActivity(intent);
                             finish();
-                        }
-                        if (e instanceof IOException) {
+                        } else {
                             Toast.makeText(MainActivity.this, R.string.internet_not_available, Toast.LENGTH_SHORT).show();
                         }
                     }
@@ -206,7 +202,7 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
         }
         disposable = RxTextView.textChangeEvents(searchEditText)
                 .doOnNext(onTextChangeEvent -> onTextChangeEvent.getText().toString())
-                .debounce(500, TimeUnit.MILLISECONDS)
+                .debounce(700, TimeUnit.MILLISECONDS)
                 .map(TextViewTextChangeEvent::getText)
                 .map(charSequence -> charSequence)
                 .observeOn(AndroidSchedulers.mainThread())
@@ -216,6 +212,7 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
                             if (length > 0 && length >= 4) {
                                 Timber.d("String second %s", queryString.toString());
                                 doctorSearchAPICall(queryString.toString(), null);
+                                hideKeyboard();
                             }
                         }
                 );
