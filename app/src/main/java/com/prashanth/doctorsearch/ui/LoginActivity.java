@@ -14,11 +14,12 @@ import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.prashanth.doctorsearch.Constants;
+import com.prashanth.doctorsearch.DoctorSearchApplication;
 import com.prashanth.doctorsearch.MainActivity;
 import com.prashanth.doctorsearch.R;
+import com.prashanth.doctorsearch.dependencyInjection.NetworkDaggerModule;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
 import com.prashanth.doctorsearch.network.model.LoginResponse;
-import com.prashanth.doctorsearch.network.networkwrapper.DoctorSearchRetrofitWrapper;
 import com.prashanth.doctorsearch.storage.LoginSharedPreferences;
 import com.tbruyelle.rxpermissions2.RxPermissions;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -26,6 +27,8 @@ import io.reactivex.observers.DisposableObserver;
 import io.reactivex.schedulers.Schedulers;
 import java.util.HashMap;
 import java.util.Map;
+import javax.inject.Inject;
+import javax.inject.Named;
 import retrofit2.Retrofit;
 import timber.log.Timber;
 
@@ -37,9 +40,16 @@ public class LoginActivity extends AppCompatActivity {
     @BindView(R.id.password)
     EditText passwordField;
 
-    private LoginSharedPreferences loginSharedPreferences;
+    @Inject
+    LoginSharedPreferences loginSharedPreferences;
 
-    private Retrofit retrofit;
+    @Inject
+    @Named(NetworkDaggerModule.LOGIN)
+    Retrofit retrofit;
+
+    @Inject
+    @Named(NetworkDaggerModule.LOGIN)
+    DoctorSearchAPI loginApi;
 
     private ProgressDialog progressDialog;
 
@@ -48,14 +58,10 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        DoctorSearchApplication.component.inject(this);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
-
         rxPermissions = new RxPermissions(this);
-
-        //use dagger
-        loginSharedPreferences = new LoginSharedPreferences(this);
-        retrofit = DoctorSearchRetrofitWrapper.retrofitClient(Constants.LOGIN_URL);
 
         progressDialog = new ProgressDialog(this);
 
@@ -85,7 +91,6 @@ public class LoginActivity extends AppCompatActivity {
             fields.put(Constants.PASSWORD_KEY, passwordField.getText().toString());
             fields.put(Constants.GRANT_TYPE_KEY, Constants.GRANT_TYPE_VALUE);
 
-            final DoctorSearchAPI loginApi = retrofit.create(DoctorSearchAPI.class);
             loginApi.login(Constants.CONTENT_TYPE,
                     Constants.CONTENT_TYPE_ACCEPT_VALUE,
                     DoctorSearchAPI.AUTHORIZATION, fields)

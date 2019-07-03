@@ -9,6 +9,8 @@ android {
         versionCode 1
         versionName "1.0"
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
+        buildConfigField "String", "LOGIN_ENDPOINT", "\"${project.loginEndPoint}\""
+        buildConfigField "String", "AUTHENTICATED_ENDPOINT", "\"${project.authenticatedEndpoint}\""
     }
     buildTypes {
         release {

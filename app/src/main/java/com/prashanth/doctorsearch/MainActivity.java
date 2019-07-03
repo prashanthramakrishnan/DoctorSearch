@@ -22,10 +22,10 @@ import com.google.android.gms.location.LocationServices;
 import com.jakewharton.rxbinding3.widget.RxTextView;
 import com.jakewharton.rxbinding3.widget.TextViewTextChangeEvent;
 import com.prashanth.doctorsearch.adapter.DoctorSearchRecyclerViewAdapter;
+import com.prashanth.doctorsearch.dependencyInjection.NetworkDaggerModule;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
 import com.prashanth.doctorsearch.network.model.Doctor;
 import com.prashanth.doctorsearch.network.model.DoctorSearchResponse;
-import com.prashanth.doctorsearch.network.networkwrapper.DoctorSearchRetrofitWrapper;
 import com.prashanth.doctorsearch.storage.LoginSharedPreferences;
 import com.prashanth.doctorsearch.ui.LoginActivity;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -35,6 +35,8 @@ import io.reactivex.schedulers.Schedulers;
 import java.io.IOException;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
+import javax.inject.Inject;
+import javax.inject.Named;
 import retrofit2.HttpException;
 import retrofit2.Retrofit;
 import timber.log.Timber;
@@ -47,15 +49,20 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
     @BindView(R.id.recycler_view)
     RecyclerView recyclerView;
 
-    private LoginSharedPreferences loginSharedPreferences;
+    @Inject
+    LoginSharedPreferences loginSharedPreferences;
 
-    private DoctorSearchAPI doctorSearchAPI;
+    @Inject
+    @Named(NetworkDaggerModule.AUTHENTICATED)
+    Retrofit retrofitForDoctorSearch;
+
+    @Inject
+    @Named(NetworkDaggerModule.AUTHENTICATED)
+    DoctorSearchAPI doctorSearchAPI;
 
     private Disposable disposable;
 
     private DoctorSearchRecyclerViewAdapter adapter;
-
-    private FusedLocationProviderClient fusedLocationClient;
 
     ArrayList<Doctor> doctors = new ArrayList<>();
 
@@ -64,10 +71,11 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
+        DoctorSearchApplication.component.inject(this);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 
-        fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
+        FusedLocationProviderClient fusedLocationClient = LocationServices.getFusedLocationProviderClient(this);
 
         if (checkCallingOrSelfPermission(Manifest.permission.ACCESS_FINE_LOCATION) == PackageManager.PERMISSION_GRANTED) {
             fusedLocationClient.getLastLocation()
@@ -79,11 +87,6 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
                         }
                     });
         }
-
-        //use dagger
-        loginSharedPreferences = new LoginSharedPreferences(this);
-        Retrofit retrofitForDoctorSearch = DoctorSearchRetrofitWrapper.retrofitClient(Constants.LOGGED_IN_URL);
-        doctorSearchAPI = retrofitForDoctorSearch.create(DoctorSearchAPI.class);
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
         adapter = new DoctorSearchRecyclerViewAdapter(MainActivity.this, doctors);
@@ -113,11 +116,6 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
                 }
             }
         });
-    }
-
-    private void updateRecycleView(ArrayList<Doctor> doctorArrayList) {
-        doctors.addAll(doctorArrayList);
-        adapter.update(doctors);
     }
 
     @Override
@@ -181,6 +179,11 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
                         //ignore
                     }
                 });
+    }
+
+    private void updateRecycleView(ArrayList<Doctor> doctorArrayList) {
+        doctors.addAll(doctorArrayList);
+        adapter.update(doctors);
     }
 
     @Override
