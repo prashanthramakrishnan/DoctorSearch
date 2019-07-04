@@ -53,4 +53,9 @@ public interface APIContract {
         void fetchData(String location, String latitude, String longitude, String lastKey);
     }
 
+    interface DoctorPhotoPresenter extends Presenter {
+
+        void fetchData(String doctorId);
+    }
+
 }

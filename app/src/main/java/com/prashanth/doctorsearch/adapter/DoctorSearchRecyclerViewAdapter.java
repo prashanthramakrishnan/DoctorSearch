@@ -14,14 +14,13 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.prashanth.doctorsearch.DoctorSearchApplication;
 import com.prashanth.doctorsearch.R;
+import com.prashanth.doctorsearch.contract.APIContract;
 import com.prashanth.doctorsearch.dependencyInjection.NetworkDaggerModule;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
 import com.prashanth.doctorsearch.network.model.Doctor;
+import com.prashanth.doctorsearch.presenter.DoctorPhotoPresenter;
 import com.prashanth.doctorsearch.storage.LoginSharedPreferences;
 import com.prashanth.doctorsearch.ui.LoginActivity;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
 import java.util.ArrayList;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -98,47 +97,50 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
 
     @SuppressLint("CheckResult")
     private void getPictureFromDoctorIDCall(Context context, String doctorId, @NotNull DoctorSearchRecyclerViewAdapter.ViewHolder holder) {
-        doctorSearchAPI.getProfilePicture(doctorId)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<Response<ResponseBody>>() {
-                    @Override
-                    public void onNext(Response<ResponseBody> response) {
-                        if (response != null && response.body() != null && response.body().byteStream() != null) {
-                            Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
-                            Glide.with(context)
-                                    .load(bitmap)
-                                    .placeholder(R.drawable.placeholder)
-                                    .error(R.drawable.placeholder)
-                                    .into(holder.photo);
 
-                        }
-                    }
+        DoctorPhotoPresenter doctorPhotoPresenter = new DoctorPhotoPresenter(doctorSearchAPI, new APIContract.DoctorPhotoView() {
+            @Override
+            public void onDataRetrievedSuccessfully(Response<ResponseBody> response) {
+                if (response != null && response.body() != null && response.body().byteStream() != null) {
+                    Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
+                    Glide.with(context.getApplicationContext())
+                            .load(bitmap)
+                            .placeholder(R.drawable.placeholder)
+                            .error(R.drawable.placeholder)
+                            .into(holder.photo);
+                }
+            }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        if (e instanceof HttpException) {
-                            int code = ((HttpException) e).response().code();
-                            if (code == 404) {
-                                Timber.d("Photo doesn't exist");
-                            }
-                            if (code == 401) {
-                                Timber.d("Logging out because of some other error");
-                                loginSharedPreferences.clear();
-                                Intent intent = new Intent(context, LoginActivity.class);
-                                intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                                context.startActivity(intent);
-                            }
-                        } else {
-                            Timber.e(e,"Handle this!");
-                        }
-                    }
+            @Override
+            public void callStarted() {
+                //no op
+            }
 
-                    @Override
-                    public void onComplete() {
-                        //do nothing
+            @Override
+            public void callComplete() {
+                //no op
+            }
+
+            @Override
+            public void callFailed(Throwable throwable) {
+                if (throwable instanceof HttpException) {
+                    int code = ((HttpException) throwable).response().code();
+                    if (code == 404) {
+                        Timber.d("Photo doesn't exist");
                     }
-                });
+                    if (code == 401) {
+                        Timber.d("Logging out because of some other error");
+                        loginSharedPreferences.clear();
+                        Intent intent = new Intent(context, LoginActivity.class);
+                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                        context.startActivity(intent);
+                    }
+                } else {
+                    Timber.e(throwable, "Handle this!");
+                }
+            }
+        });
+        doctorPhotoPresenter.fetchData(doctorId);
     }
 
     public void update(ArrayList<Doctor> doctors) {
