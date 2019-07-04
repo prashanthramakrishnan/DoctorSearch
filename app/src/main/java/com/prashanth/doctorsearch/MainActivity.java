@@ -22,16 +22,16 @@ import com.google.android.gms.location.LocationServices;
 import com.jakewharton.rxbinding3.widget.RxTextView;
 import com.jakewharton.rxbinding3.widget.TextViewTextChangeEvent;
 import com.prashanth.doctorsearch.adapter.DoctorSearchRecyclerViewAdapter;
+import com.prashanth.doctorsearch.contract.APIContract;
 import com.prashanth.doctorsearch.dependencyInjection.NetworkDaggerModule;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
 import com.prashanth.doctorsearch.network.model.Doctor;
 import com.prashanth.doctorsearch.network.model.DoctorSearchResponse;
+import com.prashanth.doctorsearch.presenter.DoctorSearchPresenter;
 import com.prashanth.doctorsearch.storage.LoginSharedPreferences;
 import com.prashanth.doctorsearch.ui.LoginActivity;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
 import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
@@ -129,46 +129,48 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
     //    "13.3976972",
     @SuppressLint("CheckResult")
     private void doctorSearchAPICall(String queryName, String lastKey) {
-        doctorSearchAPI.getDoctors(queryName,
-                String.valueOf(latitude),
-                String.valueOf(longitude), lastKey)
-                .subscribeOn(Schedulers.io())
-                .observeOn(AndroidSchedulers.mainThread())
-                .subscribeWith(new DisposableObserver<DoctorSearchResponse>() {
-                    @Override
-                    public void onNext(DoctorSearchResponse doctorSearchResponse) {
-                        Timber.d("Search response %s", doctorSearchResponse.getDoctors().size());
-                        if (lastKey == null) {
-                            if (!doctorSearchResponse.getDoctors().isEmpty()) {
-                                doctors = doctorSearchResponse.getDoctors();
-                                adapter.update(doctors);
-                            }
-                        } else {
-                            updateRecycleView(doctorSearchResponse.getDoctors());
-                        }
-                        loginSharedPreferences.setLastKey(doctorSearchResponse.getLastKey());
-                        Timber.d("Last key %s", loginSharedPreferences.getLastKey());
 
+        DoctorSearchPresenter doctorSearchPresenter = new DoctorSearchPresenter(doctorSearchAPI, new APIContract.DoctorSearchView() {
+            @Override
+            public void onDataRetrievedSuccessfully(DoctorSearchResponse doctorSearchResponse) {
+                Timber.d("Search response %s", doctorSearchResponse.getDoctors().size());
+                if (lastKey == null) {
+                    if (!doctorSearchResponse.getDoctors().isEmpty()) {
+                        doctors = doctorSearchResponse.getDoctors();
+                        adapter.update(doctors);
                     }
+                } else {
+                    updateRecycleView(doctorSearchResponse.getDoctors());
+                }
+                loginSharedPreferences.setLastKey(doctorSearchResponse.getLastKey());
+                Timber.d("Last key %s", loginSharedPreferences.getLastKey());
+            }
 
-                    @Override
-                    public void onError(Throwable e) {
-                        Timber.e(e, "Exception");
-                        if (e instanceof HttpException) {
-                            loginSharedPreferences.clear();
-                            Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                            startActivity(intent);
-                            finish();
-                        } else {
-                            Toast.makeText(MainActivity.this, R.string.internet_not_available, Toast.LENGTH_SHORT).show();
-                        }
-                    }
+            @Override
+            public void callStarted() {
+                //no op
+            }
 
-                    @Override
-                    public void onComplete() {
-                        //ignore
-                    }
-                });
+            @Override
+            public void callComplete() {
+                //no op
+            }
+
+            @Override
+            public void callFailed(Throwable throwable) {
+                Timber.e(throwable, "Exception");
+                if (throwable instanceof HttpException) {
+                    loginSharedPreferences.clear();
+                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                    startActivity(intent);
+                    finish();
+                } else {
+                    Toast.makeText(MainActivity.this, R.string.internet_not_available, Toast.LENGTH_SHORT).show();
+                }
+
+            }
+        });
+        doctorSearchPresenter.fetchData(queryName, String.valueOf(latitude), String.valueOf(longitude), lastKey);
     }
 
     private void updateRecycleView(ArrayList<Doctor> doctorArrayList) {

@@ -23,7 +23,7 @@ public interface DoctorSearchAPI {
 
     @Keep
     @GET("/api/users/me/doctors")
-    Observable<DoctorSearchResponse> getDoctors(@Query("search") String location,
+    Observable<DoctorSearchResponse> getDoctors(@Query("search") String doctorName,
                                                 @Query("lat") String latitude,
                                                 @Query("lng") String longitude,
                                                 @Query("lastKey") String lastKey);

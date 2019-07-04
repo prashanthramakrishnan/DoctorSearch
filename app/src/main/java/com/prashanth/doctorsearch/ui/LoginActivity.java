@@ -17,14 +17,13 @@ import com.prashanth.doctorsearch.Constants;
 import com.prashanth.doctorsearch.DoctorSearchApplication;
 import com.prashanth.doctorsearch.MainActivity;
 import com.prashanth.doctorsearch.R;
+import com.prashanth.doctorsearch.contract.APIContract;
 import com.prashanth.doctorsearch.dependencyInjection.NetworkDaggerModule;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
 import com.prashanth.doctorsearch.network.model.LoginResponse;
+import com.prashanth.doctorsearch.presenter.LoginAPIPresenter;
 import com.prashanth.doctorsearch.storage.LoginSharedPreferences;
 import com.tbruyelle.rxpermissions2.RxPermissions;
-import io.reactivex.android.schedulers.AndroidSchedulers;
-import io.reactivex.observers.DisposableObserver;
-import io.reactivex.schedulers.Schedulers;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
@@ -75,45 +74,44 @@ public class LoginActivity extends AppCompatActivity {
 
     @SuppressLint("CheckResult")
     private void performLoginAPICall() {
+        final Map<String, String> fields = new HashMap<>();
+        fields.put(Constants.USERNAME_KEY, Constants.USERNAME_LOGIN);
+        fields.put(Constants.PASSWORD_KEY, Constants.PASSWORD_LOGIN);
+        fields.put(Constants.GRANT_TYPE_KEY, Constants.GRANT_TYPE_VALUE);
 
-        if (progressDialog != null && !progressDialog.isShowing()) {
-            progressDialog.setMessage(getString(R.string.logging_in));
-            progressDialog.show();
-            progressDialog.setCancelable(false);
+        LoginAPIPresenter loginAPIPresenter = new LoginAPIPresenter(loginApi, new APIContract.LoginView() {
+            @Override
+            public void callStarted() {
+                if (progressDialog != null && !progressDialog.isShowing()) {
+                    progressDialog.setMessage(getString(R.string.logging_in));
+                    progressDialog.show();
+                    progressDialog.setCancelable(false);
+                }
+            }
 
-            final Map<String, String> fields = new HashMap<>();
-            fields.put(Constants.USERNAME_KEY, usernameField.getText().toString());
-            fields.put(Constants.PASSWORD_KEY, passwordField.getText().toString());
-            fields.put(Constants.GRANT_TYPE_KEY, Constants.GRANT_TYPE_VALUE);
+            @Override
+            public void callComplete() {
+                //do nothing
+            }
 
-            loginApi.login(fields)
-                    .subscribeOn(Schedulers.io())
-                    .observeOn(AndroidSchedulers.mainThread())
-                    .subscribeWith(new DisposableObserver<LoginResponse>() {
-                        @Override
-                        public void onNext(LoginResponse loginResponse) {
-                            if (loginResponse != null) {
-                                Timber.d("Access token set");
-                                loginSharedPreferences.setAccessToken(loginResponse.getAccess_token());
-                                startMainActivity();
-                            }
-                            progressDialog.dismiss();
-                        }
+            @Override
+            public void onDataRetrievedSuccessfully(LoginResponse loginResponse) {
+                if (loginResponse != null) {
+                    Timber.d("Access token set");
+                    loginSharedPreferences.setAccessToken(loginResponse.getAccess_token());
+                    startMainActivity();
+                }
+                progressDialog.dismiss();
+            }
 
-                        @Override
-                        public void onError(Throwable e) {
-                            Timber.e(e, "Error logging in");
-                            progressDialog.dismiss();
-                            Toast.makeText(LoginActivity.this, R.string.error_logging_in, Toast.LENGTH_SHORT).show();
-                        }
-
-                        @Override
-                        public void onComplete() {
-                            //do nothing
-                        }
-                    });
-        }
-
+            @Override
+            public void callFailed(Throwable throwable) {
+                Timber.e(throwable, "Error logging in");
+                progressDialog.dismiss();
+                Toast.makeText(LoginActivity.this, R.string.error_logging_in, Toast.LENGTH_SHORT).show();
+            }
+        });
+        loginAPIPresenter.fetchData(fields);
     }
 
     private void startMainActivity() {
