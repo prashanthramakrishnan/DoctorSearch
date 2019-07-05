@@ -70,7 +70,7 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
         if (photoId == null) {
             holder.photo.setImageDrawable(context.getResources().getDrawable(R.drawable.placeholder));
         } else {
-            getPhotFromDoctorID(context, doctorId, holder);
+            getPhotoFromDoctorID(context, doctorId, holder);
         }
     }
 
@@ -95,7 +95,7 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
         }
     }
 
-    private void getPhotFromDoctorID(Context context, String doctorId, @NotNull DoctorSearchRecyclerViewAdapter.ViewHolder holder) {
+    private void getPhotoFromDoctorID(Context context, String doctorId, @NotNull DoctorSearchRecyclerViewAdapter.ViewHolder holder) {
 
         DoctorPhotoPresenter doctorPhotoPresenter = new DoctorPhotoPresenter(doctorSearchAPI, new APIContract.DoctorPhotoView() {
             @Override

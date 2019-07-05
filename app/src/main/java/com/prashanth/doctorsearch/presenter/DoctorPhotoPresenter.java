@@ -28,6 +28,7 @@ public class DoctorPhotoPresenter implements APIContract.DoctorPhotoPresenter {
 
     @Override
     public void fetchData(String doctorId) {
+        photoView.callStarted();
         this.doctorId = doctorId;
         Disposable disposable = api.getProfilePicture(doctorId)
                 .subscribeOn(Schedulers.io())
@@ -53,7 +54,7 @@ public class DoctorPhotoPresenter implements APIContract.DoctorPhotoPresenter {
 
     @Override
     public void subscribe() {
-
+        fetchData(doctorId);
     }
 
     @Override

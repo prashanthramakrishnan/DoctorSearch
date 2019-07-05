@@ -2,6 +2,7 @@ package com.prashanth.doctorsearch.storage;
 
 import android.content.Context;
 import android.content.SharedPreferences;
+
 public class LoginSharedPreferences {
 
     private static final String FILE_NAME = "doctorsearch";
