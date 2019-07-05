@@ -1,7 +1,6 @@
-package com.prashanth.doctorsearch;
+package com.prashanth.doctorsearch.ui;
 
 import android.Manifest;
-import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
 import android.view.KeyEvent;
@@ -20,6 +19,8 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.jakewharton.rxbinding3.widget.RxTextView;
 import com.jakewharton.rxbinding3.widget.TextViewTextChangeEvent;
+import com.prashanth.doctorsearch.DoctorSearchApplication;
+import com.prashanth.doctorsearch.R;
 import com.prashanth.doctorsearch.adapter.DoctorSearchRecyclerViewAdapter;
 import com.prashanth.doctorsearch.contract.APIContract;
 import com.prashanth.doctorsearch.dependencyInjection.NetworkDaggerModule;
@@ -28,7 +29,6 @@ import com.prashanth.doctorsearch.network.model.Doctor;
 import com.prashanth.doctorsearch.network.model.DoctorSearchResponse;
 import com.prashanth.doctorsearch.presenter.DoctorSearchPresenter;
 import com.prashanth.doctorsearch.storage.LoginSharedPreferences;
-import com.prashanth.doctorsearch.ui.LoginActivity;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
 import java.util.ArrayList;
@@ -105,7 +105,7 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
                     //bottom of list!
                     if (loginSharedPreferences.getLastKey() != null) {
                         Toast.makeText(MainActivity.this, getResources().getString(R.string.more_doctors), Toast.LENGTH_LONG).show();
-                        doctorSearchAPICall(searchEditText.getText().toString(), loginSharedPreferences.getLastKey());
+                        searchForDoctors(searchEditText.getText().toString(), loginSharedPreferences.getLastKey());
                     } else {
                         Toast.makeText(MainActivity.this, getResources().getString(R.string.end), Toast.LENGTH_SHORT).show();
                     }
@@ -129,7 +129,7 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
 
     //    "52.534709",
     //    "13.3976972",
-    private void doctorSearchAPICall(String queryName, String lastKey) {
+    private void searchForDoctors(String queryName, String lastKey) {
 
         DoctorSearchPresenter doctorSearchPresenter = new DoctorSearchPresenter(doctorSearchAPI, new APIContract.DoctorSearchView() {
             @Override
@@ -162,8 +162,7 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
                 Timber.e(throwable, "Exception");
                 if (throwable instanceof HttpException) {
                     loginSharedPreferences.clear();
-                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
-                    startActivity(intent);
+                    LoginActivity.startActivity(MainActivity.this);
                     finish();
                 } else {
                     Toast.makeText(MainActivity.this, R.string.internet_not_available, Toast.LENGTH_SHORT).show();
@@ -214,7 +213,7 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
                             final int length = queryString.length();
                             if (length > 0 && length >= 4) {
                                 Timber.d("String second %s", queryString.toString());
-                                doctorSearchAPICall(queryString.toString(), null);
+                                searchForDoctors(queryString.toString(), null);
                                 hideKeyboard();
                             }
                         }

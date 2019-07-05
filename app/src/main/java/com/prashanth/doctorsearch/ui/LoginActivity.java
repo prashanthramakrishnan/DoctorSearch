@@ -2,6 +2,7 @@ package com.prashanth.doctorsearch.ui;
 
 import android.Manifest;
 import android.app.ProgressDialog;
+import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -14,7 +15,6 @@ import butterknife.ButterKnife;
 import butterknife.OnClick;
 import com.prashanth.doctorsearch.Constants;
 import com.prashanth.doctorsearch.DoctorSearchApplication;
-import com.prashanth.doctorsearch.MainActivity;
 import com.prashanth.doctorsearch.R;
 import com.prashanth.doctorsearch.contract.APIContract;
 import com.prashanth.doctorsearch.dependencyInjection.NetworkDaggerModule;
@@ -143,5 +143,9 @@ public class LoginActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         compositeDisposable.clear();
+    }
+
+    public static void startActivity(Context context) {
+        context.startActivity(new Intent(context, LoginActivity.class));
     }
 }

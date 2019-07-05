@@ -1,8 +1,8 @@
 package com.prashanth.doctorsearch.dependencyInjection;
 
-import com.prashanth.doctorsearch.MainActivity;
 import com.prashanth.doctorsearch.adapter.DoctorSearchRecyclerViewAdapter;
 import com.prashanth.doctorsearch.ui.LoginActivity;
+import com.prashanth.doctorsearch.ui.MainActivity;
 import dagger.Component;
 import javax.inject.Singleton;
 
