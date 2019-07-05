@@ -12,7 +12,7 @@ public class DoctorSearchApplication extends Application {
 
     public static AppDaggerGraph component;
 
-    public DaggerAppDaggerGraph.Builder daggerComponent(DoctorSearchApplication application) {
+    protected DaggerAppDaggerGraph.Builder daggerComponent(DoctorSearchApplication application) {
         return DaggerAppDaggerGraph.builder()
                 .networkDaggerModule(new NetworkDaggerModule(BuildConfig.LOGIN_ENDPOINT, BuildConfig.AUTHENTICATED_ENDPOINT))
                 .utilsModule(new UtilsModule(this))

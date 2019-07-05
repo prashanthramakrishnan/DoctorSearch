@@ -134,7 +134,6 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
         doctorSearchPresenter = new DoctorSearchPresenter(doctorSearchAPI, new APIContract.DoctorSearchView() {
             @Override
             public void onDataRetrievedSuccessfully(DoctorSearchResponse doctorSearchResponse) {
-                Timber.d("Search response %s", doctorSearchResponse.getDoctors().size());
                 if (lastKey == null) {
                     doctors = doctorSearchResponse.getDoctors();
                     adapter.update(doctors);
@@ -142,7 +141,6 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
                     updateRecycleView(doctorSearchResponse.getDoctors());
                 }
                 loginSharedPreferences.setLastKey(doctorSearchResponse.getLastKey());
-                Timber.d("Last key %s", loginSharedPreferences.getLastKey());
             }
 
             @Override
@@ -214,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
                         queryString -> {
                             final int length = queryString.length();
                             if (length > 0 && length >= 4) {
-                                Timber.d("String second %s", queryString.toString());
+                                Timber.d("String query %s", queryString.toString());
                                 searchForDoctors(queryString.toString(), null);
                                 hideKeyboard();
                             }

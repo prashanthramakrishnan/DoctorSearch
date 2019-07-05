@@ -1,0 +1,152 @@
+{
+  "doctors": [
+    {
+      "id": "ChIJt09xiX4XrjsRcTz_TcIhy2Y",
+      "name": "Dr. Ravi Mohan Rao (Best NeuroSurgeon in Bangalore, Best Neurosurgeon Near Me)",
+      "photoId": "CmRaAAAAtb4XTjEZTRGAmoYAopMYtb9NEaTs7AdFINRgr7Vi3XISD47uuuW9pRGIpyhrpiJeurvApzw0tzYrvPtDKy77jUovNwDQFve_H9A13zWm8I_efcV--gM5lF-DzdrboFd4EhAmGLAl7K2uHNP0YzD1Tj4EGhRx8lZRi42K7oXWYCuYhQpcIZ8ZYA",
+      "rating": 5.0,
+      "address": "Dr Ravi Mohan Rao Apollo Hospitals, No. 1, Old No. 28, Platform Road Near Mantri Square Mall, VV Giri Colony, Seshadripuram, Bengaluru, Karnataka 560020, India",
+      "lat": 12.9865835,
+      "lng": 77.5724321,
+      "highlighted": false,
+      "reviewCount": 5,
+      "specialityIds": [
+        1
+      ],
+      "source": "google",
+      "phoneNumber": "+91 87228 08450",
+      "email": null,
+      "website": null,
+      "openingHours": [
+        "D1T10:00/D1T16:00",
+        "D2T10:00/D2T16:00",
+        "D3T10:00/D3T16:00",
+        "D4T10:00/D4T16:00",
+        "D5T10:00/D5T16:00",
+        "D6T10:00/D6T16:00"
+      ],
+      "integration": null,
+      "translation": null
+    },
+    {
+      "id": "ChIJVS4odJMXrjsRsojyEqTtgj8",
+      "name": "DR SAPNA LULLA MBBS MS OBG Best Gynecologist near me HRBR Layout Kalyan Nagar Horamavu, Kammanahalli",
+      "photoId": "CmRaAAAAAAv8HQtrj0WGYg3LBLgvvmlyeh2X4wqXT3JRTt48gTniU2j4gsLe7MO0tvmVyu9nOTUbd6snsZXToYlHNA0yg_qQC1YuBJzFU1PMadJrfwjhjpzWb4XyU5P2j9fLzrfrEhAken1YlXmLbV-XYitn23GwGhSnQZO6GrVnaDBeS-cay_3hvP6fxA",
+      "rating": 4.699999809265137,
+      "address": "5th Main Road, 5c, SAPNA HEALTH CARE, 503, 5th Cross Rd, HRBR Layout 2nd Block, HRBR Layout, Kalyan Nagar, Bengaluru, Karnataka 560043, India",
+      "lat": 13.0248342,
+      "lng": 77.6401187,
+      "highlighted": false,
+      "reviewCount": 5,
+      "specialityIds": [
+        1
+      ],
+      "source": "google",
+      "phoneNumber": "+91 99808 11175",
+      "email": null,
+      "website": "https://sapna-health-care.business.site/",
+      "openingHours": [
+        "D1T08:00/D1T21:00",
+        "D2T08:00/D2T21:00",
+        "D3T08:00/D3T21:00",
+        "D4T08:00/D4T21:00",
+        "D5T08:00/D5T21:00",
+        "D6T08:00/D6T21:00"
+      ],
+      "integration": null,
+      "translation": null
+    },
+    {
+      "id": "ChIJL7N0UhsVrjsRU_5pxqMxp74",
+      "name": "Physio Mantra - Specialised Physiotherapy Center near me",
+      "photoId": "CmRaAAAALfr9jMYgkvAy_U78e00JtHeSO4xSeawRKN9Q4wPE1zQ1FMBAJuVPV95HnsuldYc6wHFbeKVDW0bQ_KUWj0f7mx-RbWMUBt8D2dgH4_DMNUuBUef_7YyHiOX7mWXuuBI-EhC4HZDEQQLKXhIH0crgb8N4GhQ3b3uUfK6yUOXhw25UP8f-SZJmWA",
+      "rating": 5.0,
+      "address": "158, 17th cross, 9th Main Road, 3rd Block,, Jayanagar, Opp. Prima Diagnostics. Above Travel Bazaar, Bengaluru,,, Karnataka 560011, Bairasandra Extension, Jaya Nagar 1st Block, Jayanagar, Bengaluru, Karnataka 560011, India",
+      "lat": 12.935325,
+      "lng": 77.58399,
+      "highlighted": false,
+      "reviewCount": 5,
+      "specialityIds": [
+        1
+      ],
+      "source": "google",
+      "phoneNumber": "+91 98863 30012",
+      "email": null,
+      "website": "http://www.physiomantra.in/",
+      "openingHours": [
+        "D1T10:00/D1T19:00",
+        "D2T10:00/D2T19:00",
+        "D3T10:00/D3T19:00",
+        "D4T10:00/D4T19:00",
+        "D5T10:00/D5T19:00",
+        "D6T10:00/D6T19:00"
+      ],
+      "integration": null,
+      "translation": null
+    },
+    {
+      "id": "ChIJq6Ay0FEUrjsRLK-agupqyuo",
+      "name": "Dr. Ganesh V Kamath - Best Pediatrician near me in Koramangala",
+      "photoId": null,
+      "rating": 5.0,
+      "address": "Apollo Clinic Koramangala, No. 51, Jyoti Nivas College Road, 5th Block, Koramangala, KHB Colony, 5th Block, Koramangala, Bengaluru, Karnataka 560095, India",
+      "lat": 12.93365,
+      "lng": 77.615839,
+      "highlighted": false,
+      "reviewCount": 5,
+      "specialityIds": [
+        1
+      ],
+      "source": "google",
+      "phoneNumber": "+91 1860 500 1066",
+      "email": null,
+      "website": "https://www.askapollo.com/bangalore/pediatrician/dr-ganesh-v-kamath?utm_medium=gmb&utm_source=dr-ganesh-v-kamath&utm_campaign=Organic",
+      "openingHours": [
+        "D7T10:00/D7T12:00",
+        "D1T10:00/D1T14:00",
+        "D1T17:00/D1T20:00",
+        "D2T10:00/D2T14:00",
+        "D2T17:00/D2T20:00",
+        "D3T10:00/D3T14:00",
+        "D3T17:00/D3T20:00",
+        "D4T10:00/D4T14:00",
+        "D4T17:00/D4T20:00",
+        "D5T10:00/D5T14:00",
+        "D5T17:00/D5T20:00",
+        "D6T10:00/D6T14:00",
+        "D6T17:00/D6T20:00"
+      ],
+      "integration": null,
+      "translation": null
+    },
+    {
+      "id": "ChIJAY-pGyMVrjsRbtfGWxJvmbM",
+      "name": "Dr. K Kartik Revanappa - Best Neurosurgeon near me in Bannerghatta Road",
+      "photoId": null,
+      "rating": 5.0,
+      "address": "Apollo Hospitals Bannerghatta Road, Opp.iim 154/11,bannerghatta Road. Bannerghatta Road, Krishnaraju Layout, Amalodbhavi Nagar, Panduranga Nagar, Bengaluru, Karnataka 560076, India",
+      "lat": 12.896252,
+      "lng": 77.598289,
+      "highlighted": false,
+      "reviewCount": 5,
+      "specialityIds": [
+        1
+      ],
+      "source": "google",
+      "phoneNumber": "+91 1860 500 1066",
+      "email": null,
+      "website": "https://www.askapollo.com/bangalore/neurosurgeon/dr-k-kartik-revanappa?utm_medium=gmb&utm_source=dr-k-kartik-revanappa&utm_campaign=Organic",
+      "openingHours": [
+        "D1T09:00/D1T18:00",
+        "D2T09:00/D2T18:00",
+        "D3T09:00/D3T18:00",
+        "D4T09:00/D4T18:00",
+        "D5T09:00/D5T18:00",
+        "D6T09:00/D6T18:00"
+      ],
+      "integration": null,
+      "translation": null
+    }
+  ],
+  "lastKey": null
+}

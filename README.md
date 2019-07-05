@@ -6,6 +6,11 @@ DoctorSearchApp
 
 **Features**
 - Fetches the doctor details via the specified API endpoint and shows the doctor list in a recycler view.
+- Includes unit tests for presenters and instrumentation tests for the login flow.
+
+Refer [here](https://gist.github.com/jemshit/767ab25a9670eb0083bafa65f8d786bb) for proguard rules.
+Note - Logging isn't disabled on release build, network and Timber logs will be printed! You can disable it by creating
+an application class and disabling the logs :-)
 
 **Open source libaries used**
 - **[Dagger2](https://github.com/google/dagger)**
@@ -19,6 +24,9 @@ DoctorSearchApp
 - **[Project Lombok](https://projectlombok.org)**
 - **[ButterKnife](https://github.com/JakeWharton/butterknife)**
 - **[RxPermissions](https://github.com/tbruyelle/RxPermissions)**
+- **[Robotium](https://github.com/RobotiumTech/robotium)**
+- **[MockWebServer](https://github.com/square/okhttp/tree/master/mockwebserver)**
+- **[Commons-io](https://commons.apache.org/proper/commons-io/)**
 
 ### License
 
