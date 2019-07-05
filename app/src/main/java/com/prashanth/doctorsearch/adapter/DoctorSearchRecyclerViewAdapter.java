@@ -11,6 +11,7 @@ import android.widget.ImageView;
 import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
+import com.bumptech.glide.load.engine.DiskCacheStrategy;
 import com.prashanth.doctorsearch.DoctorSearchApplication;
 import com.prashanth.doctorsearch.R;
 import com.prashanth.doctorsearch.contract.APIContract;
@@ -103,6 +104,7 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
                     Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
                     Glide.with(context.getApplicationContext())
                             .load(bitmap)
+                            .diskCacheStrategy(DiskCacheStrategy.ALL)
                             .placeholder(R.drawable.placeholder)
                             .error(R.drawable.placeholder)
                             .into(holder.photo);

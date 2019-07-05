@@ -104,7 +104,10 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
                 if (linearLayoutManager != null && linearLayoutManager.findLastCompletelyVisibleItemPosition() == doctors.size() - 1) {
                     //bottom of list!
                     if (loginSharedPreferences.getLastKey() != null) {
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.more_doctors), Toast.LENGTH_LONG).show();
                         doctorSearchAPICall(searchEditText.getText().toString(), loginSharedPreferences.getLastKey());
+                    } else {
+                        Toast.makeText(MainActivity.this, getResources().getString(R.string.end), Toast.LENGTH_SHORT).show();
                     }
                 }
             }
