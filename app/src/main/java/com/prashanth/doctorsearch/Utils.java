@@ -1,8 +1,10 @@
 package com.prashanth.doctorsearch;
 
-public class Constants {
+import retrofit2.HttpException;
 
-    private Constants() {
+public class Utils {
+
+    private Utils() {
         //prevent instance creation
     }
 
@@ -17,4 +19,12 @@ public class Constants {
     public static String USERNAME_LOGIN = "androidChallenge@vivy.com";
 
     public static String PASSWORD_LOGIN = "88888888";
+
+    public static int returnResponseCode(Throwable throwable) {
+        if (throwable instanceof HttpException) {
+            return ((HttpException) throwable).response().code();
+        } else {
+            return 0;
+        }
+    }
 }

@@ -4,7 +4,6 @@ import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 
-import androidx.annotation.Nullable;
 import com.prashanth.doctorsearch.contract.APIContract;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
 import com.prashanth.doctorsearch.network.model.DoctorSearchResponse;
@@ -14,9 +13,7 @@ import io.reactivex.android.plugins.RxAndroidPlugins;
 import io.reactivex.plugins.RxJavaPlugins;
 import io.reactivex.schedulers.Schedulers;
 import java.util.Map;
-import okhttp3.MediaType;
 import okhttp3.ResponseBody;
-import okio.BufferedSource;
 import org.junit.Before;
 import org.junit.BeforeClass;
 import org.junit.Test;
@@ -56,7 +53,7 @@ public class DoctorPhotoPresenterTest {
     public void getDataAndLoadViewFailTest() {
         DoctorPhotoPresenter presenter = new DoctorPhotoPresenter(provideDoctorSearchAPI(false), view);
         presenter.fetchData(DUMMY_ID);
-        Mockito.verify(view, times(1)).callFailed(any(Throwable.class));
+        Mockito.verify(view, times(1)).callFailed(any(Throwable.class), any(Integer.class));
     }
 
     @Test
@@ -105,29 +102,6 @@ public class DoctorPhotoPresenterTest {
         public Observable<Response<ResponseBody>> getProfilePicture(String doctorId) {
             Response<ResponseBody> response = mock(Response.class);
             return Observable.just(response);
-        }
-    }
-
-    private class MockResponse<ResponseBody> {
-
-    }
-
-    private class MockResponseBody<Response> extends ResponseBody {
-
-        @Nullable
-        @Override
-        public MediaType contentType() {
-            return null;
-        }
-
-        @Override
-        public long contentLength() {
-            return 0;
-        }
-
-        @Override
-        public BufferedSource source() {
-            return null;
         }
     }
 

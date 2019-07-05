@@ -13,9 +13,9 @@ import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import com.prashanth.doctorsearch.Constants;
 import com.prashanth.doctorsearch.DoctorSearchApplication;
 import com.prashanth.doctorsearch.R;
+import com.prashanth.doctorsearch.Utils;
 import com.prashanth.doctorsearch.contract.APIContract;
 import com.prashanth.doctorsearch.dependencyInjection.NetworkDaggerModule;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
@@ -52,6 +52,8 @@ public class LoginActivity extends AppCompatActivity {
 
     private CompositeDisposable compositeDisposable;
 
+    private LoginAPIPresenter loginAPIPresenter;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -63,8 +65,8 @@ public class LoginActivity extends AppCompatActivity {
 
         progressDialog = new ProgressDialog(this);
 
-        usernameField.setText(Constants.USERNAME_LOGIN);
-        passwordField.setText(Constants.PASSWORD_LOGIN);
+        usernameField.setText(Utils.USERNAME_LOGIN);
+        passwordField.setText(Utils.PASSWORD_LOGIN);
     }
 
     @OnClick(R.id.login_button)
@@ -78,11 +80,11 @@ public class LoginActivity extends AppCompatActivity {
 
     private void performLoginAPICall() {
         final Map<String, String> fields = new HashMap<>();
-        fields.put(Constants.USERNAME_KEY, Constants.USERNAME_LOGIN);
-        fields.put(Constants.PASSWORD_KEY, Constants.PASSWORD_LOGIN);
-        fields.put(Constants.GRANT_TYPE_KEY, Constants.GRANT_TYPE_VALUE);
+        fields.put(Utils.USERNAME_KEY, Utils.USERNAME_LOGIN);
+        fields.put(Utils.PASSWORD_KEY, Utils.PASSWORD_LOGIN);
+        fields.put(Utils.GRANT_TYPE_KEY, Utils.GRANT_TYPE_VALUE);
 
-        LoginAPIPresenter loginAPIPresenter = new LoginAPIPresenter(loginApi, new APIContract.LoginView() {
+        loginAPIPresenter = new LoginAPIPresenter(loginApi, new APIContract.LoginView() {
             @Override
             public void callStarted() {
                 if (progressDialog != null && !progressDialog.isShowing()) {
@@ -98,6 +100,13 @@ public class LoginActivity extends AppCompatActivity {
             }
 
             @Override
+            public void callFailed(Throwable throwable, int statusCode) {
+                Timber.e(throwable, "Error logging in");
+                progressDialog.dismiss();
+                Toast.makeText(LoginActivity.this, R.string.error_logging_in, Toast.LENGTH_SHORT).show();
+            }
+
+            @Override
             public void onDataRetrievedSuccessfully(LoginResponse loginResponse) {
                 if (loginResponse != null) {
                     Timber.d("Access token set");
@@ -105,13 +114,6 @@ public class LoginActivity extends AppCompatActivity {
                     startMainActivity();
                 }
                 progressDialog.dismiss();
-            }
-
-            @Override
-            public void callFailed(Throwable throwable) {
-                Timber.e(throwable, "Error logging in");
-                progressDialog.dismiss();
-                Toast.makeText(LoginActivity.this, R.string.error_logging_in, Toast.LENGTH_SHORT).show();
             }
         });
         loginAPIPresenter.fetchData(fields);
@@ -143,9 +145,15 @@ public class LoginActivity extends AppCompatActivity {
     protected void onDestroy() {
         super.onDestroy();
         compositeDisposable.clear();
+        if (loginAPIPresenter != null) {
+            loginAPIPresenter.unsubscribe();
+            loginAPIPresenter.onDestroy();
+        }
     }
 
     public static void startActivity(Context context) {
-        context.startActivity(new Intent(context, LoginActivity.class));
+        Intent intent = new Intent(context, LoginActivity.class);
+        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+        context.startActivity(intent);
     }
 }

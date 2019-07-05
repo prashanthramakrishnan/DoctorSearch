@@ -35,7 +35,6 @@ import java.util.ArrayList;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
-import retrofit2.HttpException;
 import timber.log.Timber;
 
 public class MainActivity extends AppCompatActivity implements EditText.OnEditorActionListener {
@@ -56,6 +55,8 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
     private Disposable disposable;
 
     private DoctorSearchRecyclerViewAdapter adapter;
+
+    DoctorSearchPresenter doctorSearchPresenter;
 
     ArrayList<Doctor> doctors = new ArrayList<>();
 
@@ -130,21 +131,23 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
     //    "52.534709",
     //    "13.3976972",
     private void searchForDoctors(String queryName, String lastKey) {
-
-        DoctorSearchPresenter doctorSearchPresenter = new DoctorSearchPresenter(doctorSearchAPI, new APIContract.DoctorSearchView() {
+        doctorSearchPresenter = new DoctorSearchPresenter(doctorSearchAPI, new APIContract.DoctorSearchView() {
             @Override
             public void onDataRetrievedSuccessfully(DoctorSearchResponse doctorSearchResponse) {
                 Timber.d("Search response %s", doctorSearchResponse.getDoctors().size());
                 if (lastKey == null) {
-                    if (!doctorSearchResponse.getDoctors().isEmpty()) {
-                        doctors = doctorSearchResponse.getDoctors();
-                        adapter.update(doctors);
-                    }
+                    doctors = doctorSearchResponse.getDoctors();
+                    adapter.update(doctors);
                 } else {
                     updateRecycleView(doctorSearchResponse.getDoctors());
                 }
                 loginSharedPreferences.setLastKey(doctorSearchResponse.getLastKey());
                 Timber.d("Last key %s", loginSharedPreferences.getLastKey());
+            }
+
+            @Override
+            public void noDoctorsFound() {
+                Toast.makeText(MainActivity.this, R.string.no_doctors, Toast.LENGTH_SHORT).show();
             }
 
             @Override
@@ -158,12 +161,11 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
             }
 
             @Override
-            public void callFailed(Throwable throwable) {
-                Timber.e(throwable, "Exception");
-                if (throwable instanceof HttpException) {
+            public void callFailed(Throwable throwable, int statusCode) {
+                if (statusCode == 401) {
                     loginSharedPreferences.clear();
+                    Toast.makeText(MainActivity.this, R.string.logging_out, Toast.LENGTH_SHORT).show();
                     LoginActivity.startActivity(MainActivity.this);
-                    finish();
                 } else {
                     Toast.makeText(MainActivity.this, R.string.internet_not_available, Toast.LENGTH_SHORT).show();
                 }
@@ -226,6 +228,15 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
             if (inputMethodManager != null) {
                 inputMethodManager.hideSoftInputFromWindow(getCurrentFocus().getWindowToken(), 0);
             }
+        }
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        if (doctorSearchPresenter != null) {
+            doctorSearchPresenter.unsubscribe();
+            doctorSearchPresenter.onDestroy();
         }
     }
 }

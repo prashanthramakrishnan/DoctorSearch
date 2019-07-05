@@ -1,5 +1,6 @@
 package com.prashanth.doctorsearch.presenter;
 
+import com.prashanth.doctorsearch.Utils;
 import com.prashanth.doctorsearch.contract.APIContract;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
 import com.prashanth.doctorsearch.network.model.DoctorSearchResponse;
@@ -46,12 +47,16 @@ public class DoctorSearchPresenter implements APIContract.DoctorNameSearchPresen
                 .subscribeWith(new DisposableObserver<DoctorSearchResponse>() {
                     @Override
                     public void onNext(DoctorSearchResponse doctorSearchResponse) {
-                        doctorSearchView.onDataRetrievedSuccessfully(doctorSearchResponse);
+                        if (doctorSearchResponse.getDoctors() == null || doctorSearchResponse.getDoctors().isEmpty()) {
+                            doctorSearchView.noDoctorsFound();
+                        } else {
+                            doctorSearchView.onDataRetrievedSuccessfully(doctorSearchResponse);
+                        }
                     }
 
                     @Override
                     public void onError(Throwable e) {
-                        doctorSearchView.callFailed(e);
+                        doctorSearchView.callFailed(e, Utils.returnResponseCode(e));
                     }
 
                     @Override

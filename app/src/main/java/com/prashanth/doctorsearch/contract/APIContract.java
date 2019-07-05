@@ -14,7 +14,7 @@ public interface APIContract {
 
         void callComplete();
 
-        void callFailed(Throwable throwable);
+        void callFailed(Throwable throwable, int statusCode);
     }
 
     interface LoginView extends View {
@@ -27,6 +27,7 @@ public interface APIContract {
 
         void onDataRetrievedSuccessfully(DoctorSearchResponse doctorSearchResponse);
 
+        void noDoctorsFound();
     }
 
     interface DoctorPhotoView extends View {

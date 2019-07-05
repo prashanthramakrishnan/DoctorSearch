@@ -1,5 +1,6 @@
 package com.prashanth.doctorsearch.presenter;
 
+import com.prashanth.doctorsearch.Utils;
 import com.prashanth.doctorsearch.contract.APIContract;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
 import com.prashanth.doctorsearch.network.model.LoginResponse;
@@ -43,7 +44,7 @@ public class LoginAPIPresenter implements APIContract.LoginPresenter {
 
                     @Override
                     public void onError(Throwable e) {
-                        view.callFailed(e);
+                        view.callFailed(e, Utils.returnResponseCode(e));
                     }
 
                     @Override

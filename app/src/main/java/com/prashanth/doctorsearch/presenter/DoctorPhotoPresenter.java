@@ -1,5 +1,6 @@
 package com.prashanth.doctorsearch.presenter;
 
+import com.prashanth.doctorsearch.Utils;
 import com.prashanth.doctorsearch.contract.APIContract;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
 import io.reactivex.android.schedulers.AndroidSchedulers;
@@ -41,7 +42,7 @@ public class DoctorPhotoPresenter implements APIContract.DoctorPhotoPresenter {
 
                     @Override
                     public void onError(Throwable e) {
-                        photoView.callFailed(e);
+                        photoView.callFailed(e, Utils.returnResponseCode(e));
                     }
 
                     @Override

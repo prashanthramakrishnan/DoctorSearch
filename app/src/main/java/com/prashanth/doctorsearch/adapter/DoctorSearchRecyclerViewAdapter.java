@@ -1,7 +1,6 @@
 package com.prashanth.doctorsearch.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
@@ -26,7 +25,6 @@ import javax.inject.Inject;
 import javax.inject.Named;
 import okhttp3.ResponseBody;
 import org.jetbrains.annotations.NotNull;
-import retrofit2.HttpException;
 import retrofit2.Response;
 import timber.log.Timber;
 
@@ -122,21 +120,22 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
             }
 
             @Override
-            public void callFailed(Throwable throwable) {
-                if (throwable instanceof HttpException) {
-                    int code = ((HttpException) throwable).response().code();
-                    if (code == 404) {
+            public void callFailed(Throwable throwable, int statusCode) {
+                switch (statusCode) {
+                    case 404:
                         Timber.d("Photo doesn't exist");
-                    }
-                    if (code == 401) {
+                        break;
+                    case 401:
                         Timber.d("Logging out because of some other error");
                         loginSharedPreferences.clear();
-                        Intent intent = new Intent(context, LoginActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        context.startActivity(intent);
-                    }
-                } else {
-                    Timber.e(throwable, "Handle this!");
+                        LoginActivity.startActivity(context);
+                        break;
+                    case 0:
+                        Timber.e(throwable, "Exception");
+                        break;
+                    default:
+                        Timber.e(throwable, "Exception");
+                        break;
                 }
             }
         });

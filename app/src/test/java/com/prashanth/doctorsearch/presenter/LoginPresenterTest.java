@@ -3,7 +3,7 @@ package com.prashanth.doctorsearch.presenter;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.times;
 
-import com.prashanth.doctorsearch.Constants;
+import com.prashanth.doctorsearch.Utils;
 import com.prashanth.doctorsearch.contract.APIContract;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
 import com.prashanth.doctorsearch.network.model.DoctorSearchResponse;
@@ -52,7 +52,7 @@ public class LoginPresenterTest {
     public void getDataAndLoadViewFailTest() {
         LoginAPIPresenter presenter = new LoginAPIPresenter(provideLoginAPI(false), view);
         presenter.fetchData(initLoginModel());
-        Mockito.verify(view, times(1)).callFailed(any(Throwable.class));
+        Mockito.verify(view, times(1)).callFailed(any(Throwable.class), any(Integer.class));
     }
 
     @Test
@@ -80,9 +80,9 @@ public class LoginPresenterTest {
 
     private Map<String, String> initLoginModel() {
         final Map<String, String> fields = new HashMap<>();
-        fields.put(Constants.USERNAME_KEY, Constants.USERNAME_LOGIN);
-        fields.put(Constants.PASSWORD_KEY, Constants.PASSWORD_LOGIN);
-        fields.put(Constants.GRANT_TYPE_KEY, Constants.GRANT_TYPE_VALUE);
+        fields.put(Utils.USERNAME_KEY, Utils.USERNAME_LOGIN);
+        fields.put(Utils.PASSWORD_KEY, Utils.PASSWORD_LOGIN);
+        fields.put(Utils.GRANT_TYPE_KEY, Utils.GRANT_TYPE_VALUE);
         return fields;
     }
 
