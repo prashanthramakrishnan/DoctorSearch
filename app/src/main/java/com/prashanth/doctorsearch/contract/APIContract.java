@@ -1,10 +1,12 @@
 package com.prashanth.doctorsearch.contract;
 
+import com.prashanth.doctorsearch.network.model.Doctor;
 import com.prashanth.doctorsearch.network.model.DoctorSearchResponse;
 import com.prashanth.doctorsearch.network.model.LoginResponse;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
-import okhttp3.ResponseBody;
-import retrofit2.Response;
 
 public interface APIContract {
 
@@ -31,7 +33,7 @@ public interface APIContract {
 
     interface DoctorPhotoView extends View {
 
-        void onDataRetrievedSuccessfully(Response<ResponseBody> response);
+        void onDataRetrievedSuccessfully(HashMap<String, InputStream> response);
     }
 
     interface Presenter {
@@ -55,7 +57,7 @@ public interface APIContract {
 
     interface DoctorPhotoPresenter extends Presenter {
 
-        void fetchData(String doctorId);
+        void fetchData(List<Doctor> doctorId);
     }
 
 }

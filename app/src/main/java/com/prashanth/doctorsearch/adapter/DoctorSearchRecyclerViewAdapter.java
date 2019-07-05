@@ -1,7 +1,6 @@
 package com.prashanth.doctorsearch.adapter;
 
 import android.content.Context;
-import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.view.LayoutInflater;
@@ -13,25 +12,24 @@ import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.prashanth.doctorsearch.DoctorSearchApplication;
 import com.prashanth.doctorsearch.R;
-import com.prashanth.doctorsearch.contract.APIContract;
 import com.prashanth.doctorsearch.dependencyInjection.NetworkDaggerModule;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
 import com.prashanth.doctorsearch.network.model.Doctor;
-import com.prashanth.doctorsearch.presenter.DoctorPhotoPresenter;
 import com.prashanth.doctorsearch.storage.LoginSharedPreferences;
-import com.prashanth.doctorsearch.ui.LoginActivity;
+import java.io.InputStream;
 import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
 import javax.inject.Inject;
 import javax.inject.Named;
-import okhttp3.ResponseBody;
 import org.jetbrains.annotations.NotNull;
-import retrofit2.HttpException;
-import retrofit2.Response;
-import timber.log.Timber;
 
 public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<DoctorSearchRecyclerViewAdapter.ViewHolder> {
 
-    private ArrayList<Doctor> doctorList;
+    private Set<Doctor> doctorList;
+
+    private HashMap<String, InputStream> photoStream;
 
     private Context context;
 
@@ -42,9 +40,10 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
     @Named(NetworkDaggerModule.AUTHENTICATED)
     DoctorSearchAPI doctorSearchAPI;
 
-    public DoctorSearchRecyclerViewAdapter(Context context, ArrayList<Doctor> doctorList) {
+    public DoctorSearchRecyclerViewAdapter(Context context, Set<Doctor> doctorList, HashMap<String, InputStream> photoStream) {
         this.context = context;
         this.doctorList = doctorList;
+        this.photoStream = photoStream;
         DoctorSearchApplication.component.inject(this);
     }
 
@@ -58,10 +57,16 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
     @Override
     public void onBindViewHolder(@NotNull DoctorSearchRecyclerViewAdapter.ViewHolder holder, int position) {
 
-        String address = doctorList.get(position).getAddress();
-        String doctorName = doctorList.get(position).getName();
-        String photoId = doctorList.get(position).getPhotoId();
-        String doctorId = doctorList.get(position).getId();
+        List<Doctor> tempArray  = new ArrayList<>();
+        tempArray.addAll(doctorList);
+
+        tempArray.get(position).getAddress();
+
+        String address = tempArray.get(position).getAddress();
+        String doctorName = tempArray.get(position).getName();
+        String photoId = tempArray.get(position).getPhotoId();
+        String doctorId = tempArray.get(position).getId();
+        InputStream photo = photoStream.get(doctorId);
 
         holder.address.setText(address);
         holder.name.setText(doctorName);
@@ -69,7 +74,12 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
         if (photoId == null) {
             holder.photo.setImageDrawable(context.getResources().getDrawable(R.drawable.placeholder));
         } else {
-            getPhotFromDoctorID(context, doctorId, holder);
+            Bitmap bitmap = BitmapFactory.decodeStream(photo);
+            Glide.with(context.getApplicationContext())
+                    .load(bitmap)
+                    .placeholder(R.drawable.placeholder)
+                    .error(R.drawable.placeholder)
+                    .into(holder.photo);
         }
     }
 
@@ -94,55 +104,8 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
         }
     }
 
-    private void getPhotFromDoctorID(Context context, String doctorId, @NotNull DoctorSearchRecyclerViewAdapter.ViewHolder holder) {
-
-        DoctorPhotoPresenter doctorPhotoPresenter = new DoctorPhotoPresenter(doctorSearchAPI, new APIContract.DoctorPhotoView() {
-            @Override
-            public void onDataRetrievedSuccessfully(Response<ResponseBody> response) {
-                if (response != null && response.body() != null && response.body().byteStream() != null) {
-                    Bitmap bitmap = BitmapFactory.decodeStream(response.body().byteStream());
-                    Glide.with(context.getApplicationContext())
-                            .load(bitmap)
-                            .placeholder(R.drawable.placeholder)
-                            .error(R.drawable.placeholder)
-                            .into(holder.photo);
-                }
-            }
-
-            @Override
-            public void callStarted() {
-                //no op
-            }
-
-            @Override
-            public void callComplete() {
-                //no op
-            }
-
-            @Override
-            public void callFailed(Throwable throwable) {
-                if (throwable instanceof HttpException) {
-                    int code = ((HttpException) throwable).response().code();
-                    if (code == 404) {
-                        Timber.d("Photo doesn't exist");
-                    }
-                    if (code == 401) {
-                        Timber.d("Logging out because of some other error");
-                        loginSharedPreferences.clear();
-                        Intent intent = new Intent(context, LoginActivity.class);
-                        intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
-                        context.startActivity(intent);
-                    }
-                } else {
-                    Timber.e(throwable, "Handle this!");
-                }
-            }
-        });
-        doctorPhotoPresenter.fetchData(doctorId);
-    }
-
-    public void update(ArrayList<Doctor> doctors) {
-        doctorList.clear();
+    public void update(Set<Doctor> doctors, HashMap<String, InputStream> photoBytesMap) {
+        this.photoStream.putAll(photoBytesMap);
         doctorList.addAll(doctors);
         notifyDataSetChanged();
     }

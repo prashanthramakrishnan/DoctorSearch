@@ -26,12 +26,16 @@ import com.prashanth.doctorsearch.dependencyInjection.NetworkDaggerModule;
 import com.prashanth.doctorsearch.network.DoctorSearchAPI;
 import com.prashanth.doctorsearch.network.model.Doctor;
 import com.prashanth.doctorsearch.network.model.DoctorSearchResponse;
+import com.prashanth.doctorsearch.presenter.DoctorPhotoPresenter;
 import com.prashanth.doctorsearch.presenter.DoctorSearchPresenter;
 import com.prashanth.doctorsearch.storage.LoginSharedPreferences;
 import com.prashanth.doctorsearch.ui.LoginActivity;
 import io.reactivex.android.schedulers.AndroidSchedulers;
 import io.reactivex.disposables.Disposable;
-import java.util.ArrayList;
+import java.io.InputStream;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Set;
 import java.util.concurrent.TimeUnit;
 import javax.inject.Inject;
 import javax.inject.Named;
@@ -57,7 +61,9 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
 
     private DoctorSearchRecyclerViewAdapter adapter;
 
-    ArrayList<Doctor> doctors = new ArrayList<>();
+    Set<Doctor> doctors = new HashSet<>();
+
+    HashMap<String, InputStream> photoStream = new HashMap<>();
 
     private double latitude, longitude;
 
@@ -82,7 +88,7 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
         }
 
         LinearLayoutManager linearLayoutManager = new LinearLayoutManager(MainActivity.this);
-        adapter = new DoctorSearchRecyclerViewAdapter(MainActivity.this, doctors);
+        adapter = new DoctorSearchRecyclerViewAdapter(MainActivity.this, doctors, photoStream);
         recyclerView.setLayoutManager(linearLayoutManager);
         recyclerView.setAdapter(adapter);
 
@@ -132,16 +138,55 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
             @Override
             public void onDataRetrievedSuccessfully(DoctorSearchResponse doctorSearchResponse) {
                 Timber.d("Search response %s", doctorSearchResponse.getDoctors().size());
-                if (lastKey == null) {
-                    if (!doctorSearchResponse.getDoctors().isEmpty()) {
-                        doctors = doctorSearchResponse.getDoctors();
-                        adapter.update(doctors);
-                    }
-                } else {
-                    updateRecycleView(doctorSearchResponse.getDoctors());
+
+                if (!doctorSearchResponse.getDoctors().isEmpty()) {
+                    //query for the photos
+                    doctors.addAll(doctorSearchResponse.getDoctors());
+                    DoctorPhotoPresenter doctorPhotoPresenter = new DoctorPhotoPresenter(doctorSearchAPI, new APIContract.DoctorPhotoView() {
+                        @Override
+                        public void onDataRetrievedSuccessfully(HashMap<String, InputStream> response) {
+                            photoStream.putAll(response);
+                            if (lastKey == null) {
+                                adapter.update(doctors, photoStream);
+                            } else {
+                                updateRecycleView(doctors, photoStream);
+                            }
+                            loginSharedPreferences.setLastKey(doctorSearchResponse.getLastKey());
+                            Timber.d("Last key %s", loginSharedPreferences.getLastKey());
+
+                        }
+
+                        @Override
+                        public void callStarted() {
+                            //no op
+                        }
+
+                        @Override
+                        public void callComplete() {
+                            //no op
+                        }
+
+                        @Override
+                        public void callFailed(Throwable throwable) {
+                            if (throwable instanceof HttpException) {
+                                int code = ((HttpException) throwable).response().code();
+                                if (code == 404) {
+                                    Timber.d("Photo doesn't exist");
+                                }
+                                if (code == 401) {
+                                    Timber.d("Logging out because of some other error");
+                                    loginSharedPreferences.clear();
+                                    Intent intent = new Intent(MainActivity.this, LoginActivity.class);
+                                    intent.addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK);
+                                    startActivity(intent);
+                                }
+                            } else {
+                                Timber.e(throwable, "Handle this!");
+                            }
+                        }
+                    });
+                    doctorPhotoPresenter.fetchData(doctorSearchResponse.getDoctors());
                 }
-                loginSharedPreferences.setLastKey(doctorSearchResponse.getLastKey());
-                Timber.d("Last key %s", loginSharedPreferences.getLastKey());
             }
 
             @Override
@@ -171,9 +216,10 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
         doctorSearchPresenter.fetchData(queryName, String.valueOf(latitude), String.valueOf(longitude), lastKey);
     }
 
-    private void updateRecycleView(ArrayList<Doctor> doctorArrayList) {
-        doctors.addAll(doctorArrayList);
-        adapter.update(doctors);
+    private void updateRecycleView(Set<Doctor> doctorArrayList, HashMap<String, InputStream> photoStream) {
+        this.doctors.addAll(doctorArrayList);
+        this.photoStream.putAll(photoStream);
+        adapter.update(doctors, this.photoStream);
     }
 
     @Override
