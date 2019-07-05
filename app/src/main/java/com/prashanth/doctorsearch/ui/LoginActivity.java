@@ -1,7 +1,6 @@
 package com.prashanth.doctorsearch.ui;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.app.ProgressDialog;
 import android.content.Intent;
 import android.content.pm.PackageManager;
@@ -24,6 +23,8 @@ import com.prashanth.doctorsearch.network.model.LoginResponse;
 import com.prashanth.doctorsearch.presenter.LoginAPIPresenter;
 import com.prashanth.doctorsearch.storage.LoginSharedPreferences;
 import com.tbruyelle.rxpermissions2.RxPermissions;
+import io.reactivex.disposables.CompositeDisposable;
+import io.reactivex.disposables.Disposable;
 import java.util.HashMap;
 import java.util.Map;
 import javax.inject.Inject;
@@ -49,12 +50,15 @@ public class LoginActivity extends AppCompatActivity {
 
     private RxPermissions rxPermissions;
 
+    private CompositeDisposable compositeDisposable;
+
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
         DoctorSearchApplication.component.inject(this);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
+        compositeDisposable = new CompositeDisposable();
         rxPermissions = new RxPermissions(this);
 
         progressDialog = new ProgressDialog(this);
@@ -72,7 +76,6 @@ public class LoginActivity extends AppCompatActivity {
         }
     }
 
-    @SuppressLint("CheckResult")
     private void performLoginAPICall() {
         final Map<String, String> fields = new HashMap<>();
         fields.put(Constants.USERNAME_KEY, Constants.USERNAME_LOGIN);
@@ -120,11 +123,10 @@ public class LoginActivity extends AppCompatActivity {
         finish();
     }
 
-    @SuppressLint("CheckResult")
     @Override
     protected void onResume() {
         super.onResume();
-        rxPermissions.request(Manifest.permission.ACCESS_FINE_LOCATION)
+        Disposable disposable = rxPermissions.request(Manifest.permission.ACCESS_FINE_LOCATION)
                 .subscribe(granted -> {
                     if (granted) {
                         if (loginSharedPreferences.getAccessToken() != null) {
@@ -134,5 +136,12 @@ public class LoginActivity extends AppCompatActivity {
                         Toast.makeText(LoginActivity.this, R.string.location_permission_missing, Toast.LENGTH_SHORT).show();
                     }
                 });
+        compositeDisposable.add(disposable);
+    }
+
+    @Override
+    protected void onDestroy() {
+        super.onDestroy();
+        compositeDisposable.clear();
     }
 }

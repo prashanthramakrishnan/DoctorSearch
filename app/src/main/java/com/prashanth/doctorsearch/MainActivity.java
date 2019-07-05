@@ -1,7 +1,6 @@
 package com.prashanth.doctorsearch;
 
 import android.Manifest;
-import android.annotation.SuppressLint;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.os.Bundle;
@@ -127,7 +126,6 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
 
     //    "52.534709",
     //    "13.3976972",
-    @SuppressLint("CheckResult")
     private void doctorSearchAPICall(String queryName, String lastKey) {
 
         DoctorSearchPresenter doctorSearchPresenter = new DoctorSearchPresenter(doctorSearchAPI, new APIContract.DoctorSearchView() {

@@ -1,6 +1,5 @@
 package com.prashanth.doctorsearch.adapter;
 
-import android.annotation.SuppressLint;
 import android.content.Context;
 import android.content.Intent;
 import android.graphics.Bitmap;
@@ -70,7 +69,7 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
         if (photoId == null) {
             holder.photo.setImageDrawable(context.getResources().getDrawable(R.drawable.placeholder));
         } else {
-            getPictureFromDoctorIDCall(context, doctorId, holder);
+            getPhotFromDoctorID(context, doctorId, holder);
         }
     }
 
@@ -95,8 +94,7 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
         }
     }
 
-    @SuppressLint("CheckResult")
-    private void getPictureFromDoctorIDCall(Context context, String doctorId, @NotNull DoctorSearchRecyclerViewAdapter.ViewHolder holder) {
+    private void getPhotFromDoctorID(Context context, String doctorId, @NotNull DoctorSearchRecyclerViewAdapter.ViewHolder holder) {
 
         DoctorPhotoPresenter doctorPhotoPresenter = new DoctorPhotoPresenter(doctorSearchAPI, new APIContract.DoctorPhotoView() {
             @Override
