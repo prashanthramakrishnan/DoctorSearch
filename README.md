@@ -11,8 +11,6 @@ Refer [here](https://gist.github.com/jemshit/767ab25a9670eb0083bafa65f8d786bb) f
 
 **Note**
 - There is no DB in this application, data is shown as is from the API calls!
-- Logging isn't disabled on release build, network and Timber logs will be printed! You can disable it by creating
-an application class and disabling the logs :-)
 
 **Open source libaries used**
 - **[Dagger2](https://github.com/google/dagger)**

@@ -58,7 +58,10 @@ public class NetworkDaggerModule {
         client.connectTimeout(TIMEOUT, TimeUnit.SECONDS);
         client.readTimeout(TIMEOUT, TimeUnit.SECONDS);
         client.connectTimeout(TIMEOUT, TimeUnit.SECONDS);
-        client.addInterceptor(debugInterceptor);
+        //create a network module in release folder ideally, but this works as well!
+        if (BuildConfig.DEBUG) {
+            client.addInterceptor(debugInterceptor);
+        }
         client.addInterceptor(chain -> {
             Request request = chain.request();
             if ((BuildConfig.LOGIN_ENDPOINT + "oauth/token").equals((chain.request().url().toString()))) {

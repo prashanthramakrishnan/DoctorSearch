@@ -23,6 +23,9 @@ public class DoctorSearchApplication extends Application {
     public void onCreate() {
         super.onCreate();
         component = daggerComponent(this).build();
-        Timber.plant(new Timber.DebugTree());
+        // Ideally create a release folder and add an application class and use DI.
+        if(BuildConfig.DEBUG) {
+            Timber.plant(new Timber.DebugTree());
+        }
     }
 }
