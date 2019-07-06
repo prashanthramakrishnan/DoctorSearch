@@ -28,7 +28,7 @@ import org.junit.runner.RunWith;
 import timber.log.Timber;
 
 @RunWith(AndroidJUnit4.class)
-public class FlowTest {
+public class LoginFlowTest {
 
     private MockWebServer server;
 
