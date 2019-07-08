@@ -12,7 +12,7 @@ import androidx.appcompat.app.AppCompatActivity;
 import butterknife.BindView;
 import butterknife.ButterKnife;
 import butterknife.OnClick;
-import com.prashanth.doctorsearch.DoctorSearchApplication;
+import com.prashanth.doctorsearch.DoctorSearchBaseApplication;
 import com.prashanth.doctorsearch.R;
 import com.prashanth.doctorsearch.Utils;
 import com.prashanth.doctorsearch.contract.APIContract;
@@ -56,7 +56,7 @@ public class LoginActivity extends AppCompatActivity {
     @Override
     protected void onCreate(@Nullable Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DoctorSearchApplication.component.inject(this);
+        DoctorSearchBaseApplication.component.inject(this);
         setContentView(R.layout.activity_login);
         ButterKnife.bind(this);
         compositeDisposable = new CompositeDisposable();

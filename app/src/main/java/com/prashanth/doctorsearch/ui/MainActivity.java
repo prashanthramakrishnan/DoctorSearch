@@ -19,7 +19,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.jakewharton.rxbinding3.widget.RxTextView;
 import com.jakewharton.rxbinding3.widget.TextViewTextChangeEvent;
-import com.prashanth.doctorsearch.DoctorSearchApplication;
+import com.prashanth.doctorsearch.DoctorSearchBaseApplication;
 import com.prashanth.doctorsearch.R;
 import com.prashanth.doctorsearch.adapter.DoctorSearchRecyclerViewAdapter;
 import com.prashanth.doctorsearch.contract.APIContract;
@@ -65,7 +65,7 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
-        DoctorSearchApplication.component.inject(this);
+        DoctorSearchBaseApplication.component.inject(this);
         setContentView(R.layout.activity_main);
         ButterKnife.bind(this);
 

@@ -6,13 +6,12 @@ import com.prashanth.doctorsearch.dependencyInjection.ApplicationModule;
 import com.prashanth.doctorsearch.dependencyInjection.DaggerAppDaggerGraph;
 import com.prashanth.doctorsearch.dependencyInjection.NetworkDaggerModule;
 import com.prashanth.doctorsearch.dependencyInjection.UtilsModule;
-import timber.log.Timber;
 
-public class DoctorSearchApplication extends Application {
+public class DoctorSearchBaseApplication extends Application {
 
     public static AppDaggerGraph component;
 
-    protected DaggerAppDaggerGraph.Builder daggerComponent(DoctorSearchApplication application) {
+    protected DaggerAppDaggerGraph.Builder daggerComponent(DoctorSearchBaseApplication application) {
         return DaggerAppDaggerGraph.builder()
                 .networkDaggerModule(new NetworkDaggerModule(BuildConfig.LOGIN_ENDPOINT, BuildConfig.AUTHENTICATED_ENDPOINT))
                 .utilsModule(new UtilsModule(this))
@@ -23,9 +22,5 @@ public class DoctorSearchApplication extends Application {
     public void onCreate() {
         super.onCreate();
         component = daggerComponent(this).build();
-        // Ideally create a release folder and add an application class and use DI.
-        if(BuildConfig.DEBUG) {
-            Timber.plant(new Timber.DebugTree());
-        }
     }
 }

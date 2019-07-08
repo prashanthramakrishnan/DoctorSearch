@@ -11,7 +11,7 @@ import android.widget.TextView;
 import androidx.recyclerview.widget.RecyclerView;
 import com.bumptech.glide.Glide;
 import com.bumptech.glide.load.engine.DiskCacheStrategy;
-import com.prashanth.doctorsearch.DoctorSearchApplication;
+import com.prashanth.doctorsearch.DoctorSearchBaseApplication;
 import com.prashanth.doctorsearch.R;
 import com.prashanth.doctorsearch.contract.APIContract;
 import com.prashanth.doctorsearch.dependencyInjection.NetworkDaggerModule;
@@ -44,7 +44,7 @@ public class DoctorSearchRecyclerViewAdapter extends RecyclerView.Adapter<Doctor
     public DoctorSearchRecyclerViewAdapter(Context context, ArrayList<Doctor> doctorList) {
         this.context = context;
         this.doctorList = doctorList;
-        DoctorSearchApplication.component.inject(this);
+        DoctorSearchBaseApplication.component.inject(this);
     }
 
     @NotNull
