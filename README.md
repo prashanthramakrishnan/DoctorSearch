@@ -5,6 +5,7 @@ DoctorSearchApp
 
 **Features**
 - Fetches the doctor details via the specified API endpoint and shows the doctor list in a recycler view.
+- The minimum number of characters for search is 4, this can be altered via the project level gradle file, if you want to change it.
 - Includes unit tests for presenters and instrumentation tests for the login flow.
 
 Refer [here](https://gist.github.com/jemshit/767ab25a9670eb0083bafa65f8d786bb) for proguard rules.

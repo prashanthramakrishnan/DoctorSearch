@@ -19,6 +19,7 @@ import com.google.android.gms.location.FusedLocationProviderClient;
 import com.google.android.gms.location.LocationServices;
 import com.jakewharton.rxbinding3.widget.RxTextView;
 import com.jakewharton.rxbinding3.widget.TextViewTextChangeEvent;
+import com.prashanth.doctorsearch.BuildConfig;
 import com.prashanth.doctorsearch.DoctorSearchBaseApplication;
 import com.prashanth.doctorsearch.R;
 import com.prashanth.doctorsearch.adapter.DoctorSearchRecyclerViewAdapter;
@@ -211,7 +212,7 @@ public class MainActivity extends AppCompatActivity implements EditText.OnEditor
                 .subscribe(
                         queryString -> {
                             final int length = queryString.length();
-                            if (length > 0 && length >= 4) {
+                            if (length > 0 && length >= Integer.valueOf(BuildConfig.MIN_CHARACTER_SEARCH_COUNT)) {
                                 Timber.d("String query %s", queryString.toString());
                                 searchForDoctors(queryString.toString(), null);
                                 hideKeyboard();

@@ -11,6 +11,7 @@ android {
         testInstrumentationRunner "com.prashanth.doctorsearch.TestRunner"
         buildConfigField "String", "LOGIN_ENDPOINT", "\"${project.loginEndPoint}\""
         buildConfigField "String", "AUTHENTICATED_ENDPOINT", "\"${project.authenticatedEndpoint}\""
+        buildConfigField "String", "MIN_CHARACTER_SEARCH_COUNT", "\"${project.minNumberOfCharactersForSearch}\""
     }
     buildTypes {
         release {

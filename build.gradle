@@ -28,4 +28,5 @@ task clean(type: Delete) {
 project.ext {
     loginEndPoint = "https://auth.staging.vivy.com/"
     authenticatedEndpoint = "https://api.staging.vivy.com/"
+    minNumberOfCharactersForSearch = 4
 }
